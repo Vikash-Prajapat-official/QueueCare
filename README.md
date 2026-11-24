@@ -2,7 +2,7 @@
 
 Free, open-source OPD token and queue system for Indian hospitals and clinics. MIT licence.
 
-> Status: **Phase 1 of 7** (scaffold, database schema, Docker, seed, health page). Login, queues, TV board and the rest arrive in later phases. See [SPEC.md](SPEC.md) and [DECISIONS.md](DECISIONS.md).
+> Status: **Phase 2 of 7** (adds login, roles and admin setup screens). Queues, TV board and the rest arrive in later phases. See [SPEC.md](SPEC.md) and [DECISIONS.md](DECISIONS.md).
 
 ## Run with Docker
 
@@ -28,7 +28,7 @@ npm run dev
 
 ## Demo logins (from the seed)
 
-All use the password `queuecare123` and must change it on first login (login arrives in Phase 2).
+All use the password `queuecare123` and must change it on first login. Log in at http://localhost:3000/login.
 
 | Role | Phone |
 | --- | --- |
