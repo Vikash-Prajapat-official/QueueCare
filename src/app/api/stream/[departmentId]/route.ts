@@ -7,6 +7,8 @@ import { subscribeQueue } from "@/lib/sse";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
+// On Vercel a stream may stay open this long; the browser then reconnects by itself and resyncs.
+export const maxDuration = 300;
 
 const HEARTBEAT_MS = 20_000;
 
