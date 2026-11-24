@@ -16,7 +16,7 @@ export default async function LandingPage() {
   const t = await getTranslations("landing");
   const repo = (process.env.GITHUB_URL ?? "").replace(/\/$/, "");
   const demo = process.env.DEMO_URL || "/login";
-  const email = process.env.CONTACT_EMAIL || "contact@example.org";
+  const email = process.env.CONTACT_EMAIL || "official.vikashp8@gmail.com";
   const commands = [`git clone ${repo || t("install.repoPlaceholder")} queuecare && cd queuecare`, "cp .env.example .env", "docker compose up -d"];
 
   const steps = [
