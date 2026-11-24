@@ -1,0 +1,245 @@
+// QueueCare data model (SPEC.md section 4).
+// No diagnosis or clinical notes are stored, ever.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  CLERK
+  DOCTOR
+}
+
+enum Sex {
+  M
+  F
+  O
+}
+
+enum VisitType {
+  NEW
+  FOLLOW_UP
+}
+
+enum Priority {
+  NORMAL
+  ELDERLY
+  PREGNANT
+  DISABLED
+  EMERGENCY
+}
+
+enum TokenStatus {
+  WAITING
+  CALLED
+  IN_CONSULT
+  SKIPPED
+  NO_SHOW
+  DONE
+  CANCELLED
+}
+
+enum TokenSource {
+  DESK
+  SELF
+}
+
+enum ConsentChannel {
+  DESK
+  SELF
+}
+
+model Hospital {
+  id        String   @id @default(cuid())
+  name      String
+  address   String   @default("")
+  logoUrl   String?  @map("logo_url")
+  timezone  String   @default("Asia/Kolkata")
+  settings  Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("hospitals")
+}
+
+model User {
+  id                 String   @id @default(cuid())
+  name               String
+  phone              String   @unique
+  passwordHash       String   @map("password_hash")
+  role               Role
+  departmentId       String?  @map("department_id")
+  active             Boolean  @default(true)
+  // Seeded default logins must change their password on first login (SPEC section 9).
+  mustChangePassword Boolean  @default(false) @map("must_change_password")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  department Department?  @relation(fields: [departmentId], references: [id])
+  doctor     Doctor?
+  events     QueueEvent[]
+  auditLogs  AuditLog[]
+
+  @@map("users")
+}
+
+model Department {
+  id          String  @id @default(cuid())
+  nameEn      String  @map("name_en")
+  nameHi      String  @map("name_hi")
+  tokenPrefix String  @unique @map("token_prefix")
+  color       String  @default("#0F766E")
+  active      Boolean @default(true)
+
+  rooms    Room[]
+  doctors  Doctor[]
+  sessions OpdSession[]
+  tokens   Token[]
+  users    User[]
+
+  @@map("departments")
+}
+
+model Room {
+  id           String @id @default(cuid())
+  name         String
+  departmentId String @map("department_id")
+
+  department Department @relation(fields: [departmentId], references: [id])
+  doctors    Doctor[]
+
+  @@index([departmentId])
+  @@map("rooms")
+}
+
+model Doctor {
+  id           String  @id @default(cuid())
+  userId       String  @unique @map("user_id")
+  departmentId String  @map("department_id")
+  roomId       String? @map("room_id")
+  displayName  String  @map("display_name")
+
+  user       User         @relation(fields: [userId], references: [id])
+  department Department   @relation(fields: [departmentId], references: [id])
+  room       Room?        @relation(fields: [roomId], references: [id])
+  sessions   OpdSession[]
+  tokens     Token[]
+
+  @@index([departmentId])
+  @@map("doctors")
+}
+
+model OpdSession {
+  id           String  @id @default(cuid())
+  departmentId String  @map("department_id")
+  doctorId     String? @map("doctor_id")
+  weekday      Int // 0 (Sunday) to 6 (Saturday)
+  startTime    String  @map("start_time") // "09:00"
+  endTime      String  @map("end_time") // "13:00"
+  maxTokens    Int?    @map("max_tokens")
+
+  department Department @relation(fields: [departmentId], references: [id])
+  doctor     Doctor?    @relation(fields: [doctorId], references: [id])
+
+  @@index([departmentId, weekday])
+  @@map("opd_sessions")
+}
+
+model Patient {
+  id         String   @id @default(cuid())
+  name       String
+  phone      String
+  age        Int
+  sex        Sex
+  abhaNumber String?  @map("abha_number")
+  anonymised Boolean  @default(false)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  tokens   Token[]
+  consents ConsentRecord[]
+
+  @@index([phone])
+  @@index([createdAt])
+  @@map("patients")
+}
+
+model Token {
+  id           String      @id @default(cuid())
+  code         String      @unique // 8 chars, unguessable, used in /t/<code>
+  seqNo        Int         @map("seq_no")
+  date         DateTime    @db.Date // local hospital date; numbering resets daily per department
+  departmentId String      @map("department_id")
+  doctorId     String?     @map("doctor_id")
+  patientId    String      @map("patient_id")
+  visitType    VisitType   @default(NEW) @map("visit_type")
+  priority     Priority    @default(NORMAL)
+  status       TokenStatus @default(WAITING)
+  source       TokenSource @default(DESK)
+  createdAt    DateTime    @default(now()) @map("created_at")
+  calledAt     DateTime?   @map("called_at")
+  startedAt    DateTime?   @map("started_at")
+  completedAt  DateTime?   @map("completed_at")
+  recallCount  Int         @default(0) @map("recall_count")
+  skipCount    Int         @default(0) @map("skip_count")
+
+  department Department   @relation(fields: [departmentId], references: [id])
+  doctor     Doctor?      @relation(fields: [doctorId], references: [id])
+  patient    Patient      @relation(fields: [patientId], references: [id])
+  events     QueueEvent[]
+
+  @@unique([departmentId, date, seqNo])
+  @@index([departmentId, date, status])
+  @@index([doctorId, date, status])
+  @@index([patientId])
+  @@map("tokens")
+}
+
+model QueueEvent {
+  id          String   @id @default(cuid())
+  tokenId     String   @map("token_id")
+  action      String
+  actorUserId String?  @map("actor_user_id")
+  at          DateTime @default(now())
+  meta        Json     @default("{}")
+
+  token Token @relation(fields: [tokenId], references: [id])
+  actor User? @relation(fields: [actorUserId], references: [id])
+
+  @@index([tokenId])
+  @@index([at])
+  @@map("queue_events")
+}
+
+model ConsentRecord {
+  id            String         @id @default(cuid())
+  patientId     String         @map("patient_id")
+  purpose       String
+  noticeVersion String         @map("notice_version")
+  givenAt       DateTime       @default(now()) @map("given_at")
+  channel       ConsentChannel
+
+  patient Patient @relation(fields: [patientId], references: [id])
+
+  @@index([patientId])
+  @@map("consent_records")
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  actorUserId String?  @map("actor_user_id")
+  action      String
+  entity      String
+  entityId    String?  @map("entity_id")
+  at          DateTime @default(now())
+  ip          String?
+
+  actor User? @relation(fields: [actorUserId], references: [id])
+
+  @@index([at])
+  @@index([entity, entityId])
+  @@map("audit_logs")
+}
