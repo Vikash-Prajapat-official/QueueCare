@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { ApiError, type AuthedUser } from "@/lib/api";
 import { db } from "@/lib/db";
+import { isDemoMode } from "@/lib/demo";
 import {
   colorSchema,
   passwordSchema,
@@ -101,6 +102,8 @@ export const users: AdminEntity = {
   },
   async update(rid, body, actor) {
     const { password, ...data } = userUpdate.parse(body);
+    // On the public demo the shared logins must stay as they are, or one visitor could lock out the rest.
+    if (isDemoMode()) throw new ApiError(403, "DEMO_MODE", "This is a public demo: passwords and user accounts cannot be changed.");
     if (rid === actor.id && (data.role !== undefined || data.active === false)) {
       throw new ApiError(400, "SELF_LOCKOUT", "You cannot change your own role or deactivate yourself.");
     }

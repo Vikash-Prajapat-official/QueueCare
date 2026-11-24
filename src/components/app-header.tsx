@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { DemoBanner } from "@/components/demo-banner";
 import { LanguageToggle } from "@/components/language-toggle";
 import { Button } from "@/components/ui/button";
 import { signOut } from "@/lib/auth";
@@ -34,6 +35,8 @@ const NAV: Record<Role, { href: string; key: NavKey }[]> = {
 export async function AppHeader({ name, role }: { name: string; role: Role }) {
   const t = await getTranslations();
   return (
+    <>
+    <DemoBanner />
     <header className="border-b border-border bg-primary text-primary-foreground print:hidden">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3 sm:px-6">
         <Link href="/" className="text-lg font-bold">
@@ -67,5 +70,6 @@ export async function AppHeader({ name, role }: { name: string; role: Role }) {
         </div>
       </div>
     </header>
+    </>
   );
 }

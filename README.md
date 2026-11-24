@@ -34,6 +34,10 @@ Then either:
 
 **Everything else is in [ADMIN_GUIDE.md](ADMIN_GUIDE.md):** first-time setup, the TV board, the QR poster, HTTPS, backups and restore, updating, security checklist and troubleshooting.
 
+## Live demo
+
+**https://queuecare-ten.vercel.app/login** (sample data, shared logins, password `queuecare123`: admin 9000000001, clerk 9000000021, doctor 9000000011). It is a demo on free hosting, so please do not enter real patient details. For a real hospital, install it on your own computer as described above: the data then never leaves your building.
+
 ## Demo logins (after the seed)
 
 All use the password `queuecare123` and must change it at first login (http://localhost:3000/login).

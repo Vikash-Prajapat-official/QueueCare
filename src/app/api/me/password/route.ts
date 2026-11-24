@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { ApiError, readJson, requireRole, route } from "@/lib/api";
 import { audit } from "@/lib/audit";
 import { db } from "@/lib/db";
+import { isDemoMode } from "@/lib/demo";
 import { enforce } from "@/lib/public-limits";
 import { ROLES } from "@/lib/rbac";
 import { changePasswordSchema } from "@/lib/validation";
@@ -10,6 +11,7 @@ import { changePasswordSchema } from "@/lib/validation";
 // Any logged-in role may change its own password, including users who are forced to.
 export const POST = route(async (req: Request) => {
   const actor = await requireRole(ROLES, { allowPasswordChangePending: true });
+  if (isDemoMode()) throw new ApiError(403, "DEMO_MODE", "This is a public demo: passwords and user accounts cannot be changed.");
   // Someone with a stolen session could guess the current password, so tries are limited per user.
   enforce(`password:${actor.id}`, 10, 15 * 60_000, "password attempts");
   const { currentPassword, newPassword } = changePasswordSchema.parse(await readJson(req));

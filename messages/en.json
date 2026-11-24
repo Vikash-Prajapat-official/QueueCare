@@ -113,6 +113,7 @@
     "SELF_LOCKOUT": "You cannot change your own role or deactivate yourself.",
     "VALIDATION": "Please check the details you entered.",
     "WRONG_PASSWORD": "Current password is incorrect.",
+    "DEMO_MODE": "This is a public demo: passwords and user accounts cannot be changed.",
     "UNAUTHENTICATED": "Please log in.",
     "FORBIDDEN": "You do not have permission to do this.",
     "NOT_YOUR_PATIENT": "This patient was called by another doctor.",
@@ -128,6 +129,10 @@
     "NETWORK": "Could not reach the server. Check the connection and try again.",
     "INVALID_MOVE": "This token cannot be changed that way now. Please reload the page.",
     "CURRENT_PATIENT_ACTIVE": "The current patient has been called. Start the consult, skip, or mark no-show first."
+  },
+  "demo": {
+    "banner": "Public demo with sample data. Please do not enter real patient details. The data is reset from time to time.",
+    "logins": "Demo logins (password queuecare123): admin 9000000001, clerk 9000000021, doctor 9000000011"
   },
   "login": {
     "metaTitle": "Log in",
