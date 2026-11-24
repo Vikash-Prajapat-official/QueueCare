@@ -117,7 +117,13 @@ const isoDay = (d: Date) => d.toISOString().slice(0, 10);
 
 export type CreateTokenInput = z.infer<typeof createTokenSchema>;
 
-export async function createToken(input: CreateTokenInput, actor: AuthedUser, req: Request) {
+/** `actor` is null and `source` is "SELF" when a patient checks in on their own phone. */
+export async function createToken(
+  input: CreateTokenInput,
+  actor: AuthedUser | null,
+  req: Request,
+  source: "DESK" | "SELF" = "DESK",
+) {
   const department = await db.department.findUnique({
     where: { id: input.departmentId },
     select: { id: true, tokenPrefix: true, nameEn: true, nameHi: true, active: true },
@@ -164,7 +170,7 @@ export async function createToken(input: CreateTokenInput, actor: AuthedUser, re
     if (!patientId) throw new ApiError(400, "VALIDATION", "Patient details are required.");
 
     await tx.consentRecord.create({
-      data: { patientId, purpose: "OPD queue", noticeVersion: CONSENT_NOTICE_VERSION, channel: "DESK" },
+      data: { patientId, purpose: "OPD queue", noticeVersion: CONSENT_NOTICE_VERSION, channel: source },
     });
 
     // Numbering restarts at 1 each local day because the highest number is taken per (department, date).
@@ -186,10 +192,10 @@ export async function createToken(input: CreateTokenInput, actor: AuthedUser, re
         patientId,
         visitType: input.visitType,
         priority: input.priority,
-        source: "DESK",
+        source,
       },
     });
-    await record(tx, created.id, "create", actor, { priority: input.priority, source: "DESK" }, req);
+    await record(tx, created.id, "create", actor, { priority: input.priority, source }, req);
     await notify(tx, department.id, { type: "token", action: "create", tokenId: created.id });
     return created;
   });

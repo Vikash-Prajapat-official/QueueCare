@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAutoRefresh } from "@/hooks/use-auto-refresh";
+import { useQueueRefresh } from "@/hooks/use-queue-refresh";
 import { PRIORITY_LABELS } from "@/lib/queue-labels";
 import type { getQueueSnapshot } from "@/lib/queue-service";
 
@@ -24,7 +24,7 @@ export function DoctorConsole({
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  useAutoRefresh(5000);
+  useQueueRefresh([snapshot.department.id]);
 
   const current = snapshot.current[0] ?? null;
   const called = current?.status === "CALLED";

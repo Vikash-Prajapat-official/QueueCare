@@ -11,6 +11,7 @@ const NAV: Record<Role, { href: string; label: string }[]> = {
     { href: "/admin/doctors", label: "Doctors" },
     { href: "/admin/sessions", label: "Sessions" },
     { href: "/admin/users", label: "Users" },
+    { href: "/admin/poster", label: "Poster & TV" },
     { href: "/desk", label: "New token" },
     { href: "/desk/queues", label: "Queues" },
   ],
@@ -23,7 +24,7 @@ const NAV: Record<Role, { href: string; label: string }[]> = {
 
 export function AppHeader({ name, role }: { name: string; role: Role }) {
   return (
-    <header className="border-b border-border bg-primary text-primary-foreground">
+    <header className="border-b border-border bg-primary text-primary-foreground print:hidden">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3 sm:px-6">
         <Link href="/" className="text-lg font-bold">
           QueueCare

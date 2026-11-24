@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select } from "@/components/ui/form";
-import { useAutoRefresh } from "@/hooks/use-auto-refresh";
+import { useQueueRefresh } from "@/hooks/use-queue-refresh";
 import { PRIORITY_LABELS, STATUS_LABELS } from "@/lib/queue-labels";
 import type { getQueueSnapshot } from "@/lib/queue-service";
 
@@ -15,7 +15,7 @@ export function QueueBoard({ snapshots }: { snapshots: Snapshot[] }) {
   const router = useRouter();
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  useAutoRefresh(8000);
+  useQueueRefresh(snapshots.map((s) => s.department.id));
 
   async function act(tokenId: string, action: "transfer" | "cancel", body?: unknown) {
     setBusy(tokenId);

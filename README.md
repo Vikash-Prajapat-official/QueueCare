@@ -2,7 +2,12 @@
 
 Free, open-source OPD token and queue system for Indian hospitals and clinics. MIT licence.
 
-> Status: **Phase 3 of 7** (adds token creation, the queue engine, queue APIs, desk screens and the doctor console). The TV board, patient pages and the rest arrive in later phases. See [SPEC.md](SPEC.md) and [DECISIONS.md](DECISIONS.md).
+> Status: **Phase 4 of 7** (adds live updates, the TV board with voice, patient self check-in and the token status page). Reports, backups, Hindi for every screen and the rest arrive in later phases.
+
+## TV board and check-in
+
+- **TV board:** log in as admin and open *Poster & TV* for the address of each board. Open it in the TV's browser and press OK once to turn on the sound. Set `APP_URL` (your server's LAN address) and `DISPLAY_KEY` in `.env` first.
+- **Check-in poster:** print it from the same page. Patients scan it and open `/checkin`, then follow their turn at `/t/<code>`. See [SPEC.md](SPEC.md) and [DECISIONS.md](DECISIONS.md).
 
 ## Run with Docker
 
