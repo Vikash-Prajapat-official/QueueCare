@@ -203,7 +203,7 @@ export function DisplayBoard({
             <section
               key={room.key}
               aria-label={room.title}
-              className={`flex min-h-0 flex-col justify-between rounded-2xl border-l-[1.2vw] bg-neutral-900 p-[1.6vw] ${
+              className={`@container flex min-h-0 flex-col justify-between rounded-2xl border-l-[1.2vw] bg-neutral-900 p-[1.6vw] ${
                 flashing.has(room.key) ? "animate-pulse ring-8 ring-yellow-300" : ""
               }`}
               style={{ borderLeftColor: room.color }}
@@ -219,7 +219,8 @@ export function DisplayBoard({
                 {c ? (
                   <>
                     <p
-                      className={`text-[clamp(3.5rem,11vw,13rem)] font-extrabold leading-none tabular-nums ${
+                      // Sized by the room's own width (cqw), so "GYN-004" never wraps or clips with 3 or 4 rooms on one TV.
+                      className={`whitespace-nowrap text-[clamp(2rem,19cqw,13rem)] font-extrabold leading-none tabular-nums ${
                         calling ? "text-yellow-300" : "text-neutral-400"
                       }`}
                     >

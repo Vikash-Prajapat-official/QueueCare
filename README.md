@@ -13,6 +13,22 @@ No more standing in OPD lines: patients get a token at the desk or by scanning a
 - **Privacy**: consent record, automatic anonymising after a set number of days, patient data export and erase
 - **Encrypted nightly backups**, installable on phones (PWA)
 
+## Screenshots
+
+All with sample data. The TV board shows token numbers only, never names.
+
+![The TV board in the waiting room, four rooms, bilingual](docs/screenshots/tv-board.jpeg)
+
+| Doctor console | Patient's phone |
+| --- | --- |
+| ![Doctor console with the Next button and the waiting list](docs/screenshots/doctor.png) | ![Phone page saying "It is your turn!"](docs/screenshots/patient-phone.jpeg) |
+
+| Registration desk | Today's queues |
+| --- | --- |
+| ![Registration desk: new token form](docs/screenshots/desk.png) | ![Today's queues by department](docs/screenshots/queues.png) |
+
+![Landing page](docs/screenshots/landing.png)
+
 ## Install in three commands
 
 You need a computer with [Docker](https://docs.docker.com/get-docker/) (2 GB of memory is enough).
