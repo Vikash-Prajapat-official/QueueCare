@@ -185,6 +185,8 @@ model Token {
   completedAt  DateTime?   @map("completed_at")
   recallCount  Int         @default(0) @map("recall_count")
   skipCount    Int         @default(0) @map("skip_count")
+  // Calls still to be made before a SKIPPED token returns to WAITING (see src/lib/queue.ts).
+  skipHold     Int         @default(0) @map("skip_hold")
 
   department Department   @relation(fields: [departmentId], references: [id])
   doctor     Doctor?      @relation(fields: [doctorId], references: [id])

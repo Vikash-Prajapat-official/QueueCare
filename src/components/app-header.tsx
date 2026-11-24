@@ -11,9 +11,13 @@ const NAV: Record<Role, { href: string; label: string }[]> = {
     { href: "/admin/doctors", label: "Doctors" },
     { href: "/admin/sessions", label: "Sessions" },
     { href: "/admin/users", label: "Users" },
-    { href: "/desk", label: "Desk" },
+    { href: "/desk", label: "New token" },
+    { href: "/desk/queues", label: "Queues" },
   ],
-  CLERK: [{ href: "/desk", label: "Desk" }],
+  CLERK: [
+    { href: "/desk", label: "New token" },
+    { href: "/desk/queues", label: "Queues" },
+  ],
   DOCTOR: [{ href: "/doctor", label: "Doctor console" }],
 };
 

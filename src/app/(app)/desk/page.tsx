@@ -1,18 +1,24 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { db } from "@/lib/db";
 import { requirePageRole } from "@/lib/page-auth";
+import { listDepartments } from "@/lib/queue-service";
+import { NewTokenForm } from "./new-token-form";
 
-export const metadata = { title: "Desk · QueueCare" };
+export const metadata = { title: "New token · QueueCare" };
 
 export default async function DeskPage() {
-  const user = await requirePageRole(["ADMIN", "CLERK"]);
+  await requirePageRole(["ADMIN", "CLERK"]);
+  const [departments, hospital] = await Promise.all([
+    listDepartments(),
+    db.hospital.findFirst({ select: { name: true } }),
+  ]);
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Registration desk</CardTitle>
-      </CardHeader>
-      <CardContent className="text-sm text-muted-foreground">
-        Welcome, {user.name}. Token creation and today&apos;s queues arrive in Phase 3.
-      </CardContent>
-    </Card>
+    <div className="space-y-4">
+      <h1 className="text-2xl font-bold">Registration desk</h1>
+      <NewTokenForm
+        departments={departments}
+        hospitalName={hospital?.name ?? "QueueCare"}
+        appUrl={process.env.APP_URL ?? ""}
+      />
+    </div>
   );
 }

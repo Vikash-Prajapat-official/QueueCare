@@ -1,6 +1,7 @@
+import type { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 
-function clientIp(req?: Request): string | null {
+export function clientIp(req?: Request): string | null {
   if (!req) return null;
   const fwd = req.headers.get("x-forwarded-for");
   if (fwd) return fwd.split(",")[0]?.trim() || null;
@@ -14,8 +15,10 @@ export async function audit(
   entity: string,
   entityId: string | null,
   req?: Request,
+  // Pass the transaction client to write the log in the same transaction as the change.
+  client: Prisma.TransactionClient = db,
 ) {
-  await db.auditLog.create({
+  await client.auditLog.create({
     data: { actorUserId, action, entity, entityId, ip: clientIp(req) },
   });
 }

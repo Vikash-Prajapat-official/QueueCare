@@ -35,3 +35,45 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
 }
+
+/* Token slip for a 58 mm thermal printer (printed through the browser print dialog). */
+.print-slip-root {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: 58mm auto;
+    margin: 0;
+  }
+  body > :not(.print-slip-root) {
+    display: none !important;
+  }
+  .print-slip-root {
+    display: block;
+    width: 58mm;
+    padding: 3mm;
+    color: #000;
+    background: #fff;
+    text-align: center;
+    font-size: 11pt;
+    line-height: 1.3;
+  }
+  .print-slip-root .slip-hospital {
+    font-weight: 600;
+  }
+  .print-slip-root .slip-label {
+    font-size: 30pt;
+    font-weight: 700;
+    line-height: 1.1;
+    margin: 2mm 0;
+  }
+  .print-slip-root .slip-small {
+    font-size: 8pt;
+  }
+  .print-slip-root .slip-qr {
+    width: 32mm;
+    height: 32mm;
+    margin: 2mm auto;
+  }
+}

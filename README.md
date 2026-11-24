@@ -2,7 +2,7 @@
 
 Free, open-source OPD token and queue system for Indian hospitals and clinics. MIT licence.
 
-> Status: **Phase 2 of 7** (adds login, roles and admin setup screens). Queues, TV board and the rest arrive in later phases. See [SPEC.md](SPEC.md) and [DECISIONS.md](DECISIONS.md).
+> Status: **Phase 3 of 7** (adds token creation, the queue engine, queue APIs, desk screens and the doctor console). The TV board, patient pages and the rest arrive in later phases. See [SPEC.md](SPEC.md) and [DECISIONS.md](DECISIONS.md).
 
 ## Run with Docker
 
