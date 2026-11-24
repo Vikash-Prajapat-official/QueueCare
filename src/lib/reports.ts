@@ -21,6 +21,7 @@ export interface ReportToken {
 export interface DepartmentInfo {
   id: string;
   nameEn: string;
+  nameHi?: string;
   tokenPrefix: string;
 }
 
@@ -47,7 +48,7 @@ export interface Report {
   totals: Stats;
 }
 
-type Range = { ok: true; from: string; to: string } | { ok: false; message: string };
+type Range = { ok: true; from: string; to: string } | { ok: false; message: string; reason: "format" | "order" | "long" };
 
 /** Picks the date range. Missing dates default to the last 7 days ending today. */
 export function resolveRange(
@@ -58,9 +59,9 @@ export function resolveRange(
 ): Range {
   const end = to || today;
   const start = from || addDays(end, -6);
-  if (!isValidYmd(start) || !isValidYmd(end)) return { ok: false, message: "Dates must look like 2026-11-24." };
-  if (start > end) return { ok: false, message: "The start date is after the end date." };
-  if (daysInRange(start, end) > maxDays) return { ok: false, message: `Choose at most ${maxDays} days at a time.` };
+  if (!isValidYmd(start) || !isValidYmd(end)) return { ok: false, reason: "format", message: "Dates must look like 2026-11-24." };
+  if (start > end) return { ok: false, reason: "order", message: "The start date is after the end date." };
+  if (daysInRange(start, end) > maxDays) return { ok: false, reason: "long", message: `Choose at most ${maxDays} days at a time.` };
   return { ok: true, from: start, to: end };
 }
 

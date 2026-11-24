@@ -1,13 +1,16 @@
+import { getTranslations } from "next-intl/server";
+import { pageTitle } from "@/i18n/meta";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { db } from "@/lib/db";
 import { requirePageRole } from "@/lib/page-auth";
 import { getQueueSnapshot } from "@/lib/queue-service";
 import { DoctorConsole } from "./doctor-console";
 
-export const metadata = { title: "Doctor console · QueueCare" };
+export const generateMetadata = pageTitle("doctorConsole");
 
 export default async function DoctorPage() {
   const user = await requirePageRole(["DOCTOR"]);
+  const t = await getTranslations("doctor");
   const doctor = await db.doctor.findUnique({
     where: { userId: user.id },
     select: { id: true, departmentId: true, displayName: true, room: { select: { name: true } } },
@@ -17,10 +20,10 @@ export default async function DoctorPage() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Doctor console</CardTitle>
+          <CardTitle>{t("title")}</CardTitle>
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground">
-          Your doctor profile is not set up yet. Ask the admin to add it under Admin, Doctors.
+          {t("noProfile")}
         </CardContent>
       </Card>
     );

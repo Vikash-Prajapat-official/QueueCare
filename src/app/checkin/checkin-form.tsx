@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/form";
+import { apiErrorText } from "@/lib/api-error-text";
 
 interface Dept {
   id: string;
@@ -11,14 +13,14 @@ interface Dept {
   nameHi: string;
 }
 
-const SEXES = [
-  { value: "M", en: "Male", hi: "पुरुष" },
-  { value: "F", en: "Female", hi: "महिला" },
-  { value: "O", en: "Other", hi: "अन्य" },
-];
+const SEXES = ["M", "F", "O"] as const;
 
-export function CheckInForm({ departments, notice }: { departments: Dept[]; notice: { en: string; hi: string } }) {
+export function CheckInForm({ departments, notice }: { departments: Dept[]; notice: string }) {
   const router = useRouter();
+  const t = useTranslations("checkin");
+  const tc = useTranslations();
+  const te = useTranslations("errors");
+  const locale = useLocale();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [age, setAge] = useState("");
@@ -31,8 +33,8 @@ export function CheckInForm({ departments, notice }: { departments: Dept[]; noti
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    if (!departmentId) return setError("Please choose a department. / कृपया विभाग चुनें।");
-    if (!sex) return setError("Please choose male, female or other. / कृपया लिंग चुनें।");
+    if (!departmentId) return setError(t("pickDepartment"));
+    if (!sex) return setError(t("pickSex"));
     setBusy(true);
     try {
       const res = await fetch("/api/checkin", {
@@ -42,12 +44,12 @@ export function CheckInForm({ departments, notice }: { departments: Dept[]; noti
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(data?.error?.message ?? "Something went wrong. Please try again.");
+        setError(apiErrorText(te, locale, data, t("failed")));
         return;
       }
       router.push(`/t/${data.code}`);
     } catch {
-      setError("Could not reach the hospital server. Please try again or use the desk.");
+      setError(t("network"));
     } finally {
       setBusy(false);
     }
@@ -57,13 +59,13 @@ export function CheckInForm({ departments, notice }: { departments: Dept[]; noti
     <form onSubmit={submit} className="space-y-4">
       <div>
         <Label htmlFor="name" className="text-base">
-          Name · नाम
+          {t("name")}
         </Label>
         <Input id="name" className="h-12 text-base" required autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} />
       </div>
       <div>
         <Label htmlFor="phone" className="text-base">
-          Mobile number · मोबाइल नंबर
+          {t("phone")}
         </Label>
         <Input
           id="phone"
@@ -78,7 +80,7 @@ export function CheckInForm({ departments, notice }: { departments: Dept[]; noti
       </div>
       <div>
         <Label htmlFor="age" className="text-base">
-          Age · उम्र
+          {t("age")}
         </Label>
         <Input
           id="age"
@@ -94,28 +96,26 @@ export function CheckInForm({ departments, notice }: { departments: Dept[]; noti
       </div>
 
       <fieldset>
-        <legend className="mb-1 text-base font-medium">Sex · लिंग</legend>
+        <legend className="mb-1 text-base font-medium">{t("sex")}</legend>
         <div className="grid grid-cols-3 gap-2">
           {SEXES.map((s) => (
             <button
-              key={s.value}
+              key={s}
               type="button"
-              aria-pressed={sex === s.value}
-              onClick={() => setSex(s.value)}
+              aria-pressed={sex === s}
+              onClick={() => setSex(s)}
               className={`h-14 rounded-md border text-base ${
-                sex === s.value ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background"
+                sex === s ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background"
               }`}
             >
-              {s.en}
-              <br />
-              <span className="text-sm">{s.hi}</span>
+              {tc(`sex.${s}`)}
             </button>
           ))}
         </div>
       </fieldset>
 
       <fieldset>
-        <legend className="mb-1 text-base font-medium">Department · विभाग</legend>
+        <legend className="mb-1 text-base font-medium">{t("department")}</legend>
         <div className="grid gap-2">
           {departments.map((d) => (
             <button
@@ -127,19 +127,14 @@ export function CheckInForm({ departments, notice }: { departments: Dept[]; noti
                 departmentId === d.id ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background"
               }`}
             >
-              {d.nameEn} · {d.nameHi}
+              {locale === "hi" ? d.nameHi : d.nameEn}
             </button>
           ))}
         </div>
       </fieldset>
 
       <div className="rounded-md border border-border bg-muted p-3 text-sm">
-        <p>
-          {notice.en}
-        </p>
-        <p className="mt-2">
-          {notice.hi}
-        </p>
+        <p>{notice}</p>
       </div>
       <label htmlFor="consent" className="flex items-start gap-3 text-base">
         <input
@@ -150,7 +145,7 @@ export function CheckInForm({ departments, notice }: { departments: Dept[]; noti
           onChange={(e) => setConsent(e.target.checked)}
           required
         />
-        <span>I agree · मैं सहमत हूँ</span>
+        <span>{t("agree")}</span>
       </label>
 
       {error && (
@@ -159,7 +154,7 @@ export function CheckInForm({ departments, notice }: { departments: Dept[]; noti
         </p>
       )}
       <Button type="submit" size="lg" className="h-14 w-full text-lg" disabled={busy || !consent}>
-        {busy ? "Please wait… · कृपया प्रतीक्षा करें…" : "Get token · टोकन पाएँ"}
+        {busy ? t("wait") : t("submit")}
       </Button>
     </form>
   );

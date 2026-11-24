@@ -16,7 +16,7 @@ const dateOnly = (ymd: string) => new Date(`${ymd}T00:00:00.000Z`);
 
 export async function getReport(from: string, to: string): Promise<Report> {
   const [departments, tokens] = await Promise.all([
-    db.department.findMany({ orderBy: { nameEn: "asc" }, select: { id: true, nameEn: true, tokenPrefix: true } }),
+    db.department.findMany({ orderBy: { nameEn: "asc" }, select: { id: true, nameEn: true, nameHi: true, tokenPrefix: true } }),
     db.token.findMany({
       where: { date: { gte: dateOnly(from), lte: dateOnly(to) } },
       select: {

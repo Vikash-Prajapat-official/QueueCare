@@ -12,3 +12,8 @@ backups
 playwright-report
 test-results
 .DS_Store
+
+# generated service worker (PWA)
+/public/sw.js
+/public/sw.js.map
+/public/swe-worker-*.js

@@ -1,0 +1,597 @@
+{
+  "meta": {
+    "description": "Free, open-source OPD token and queue system for hospitals and clinics."
+  },
+  "common": {
+    "language": "Language",
+    "appName": "QueueCare",
+    "logOut": "Log out",
+    "changePassword": "Change password",
+    "save": "Save",
+    "cancel": "Cancel",
+    "loading": "Loading…",
+    "saving": "Saving…",
+    "back": "Back",
+    "close": "Close",
+    "yes": "Yes",
+    "no": "No",
+    "none": "None",
+    "all": "All",
+    "search": "Search",
+    "edit": "Edit",
+    "add": "Add",
+    "active": "Active",
+    "inactive": "Inactive",
+    "name": "Name",
+    "phone": "Phone number",
+    "actions": "Actions",
+    "minutesShort": "{n} min",
+    "noConnection": "Could not reach the server.",
+    "tryAgain": "Please try again.",
+    "skipToContent": "Skip to content"
+  },
+  "roles": {
+    "ADMIN": "admin",
+    "CLERK": "clerk",
+    "DOCTOR": "doctor"
+  },
+  "nav": {
+    "main": "Main",
+    "overview": "Overview",
+    "departments": "Departments",
+    "rooms": "Rooms",
+    "doctors": "Doctors",
+    "sessions": "Sessions",
+    "users": "Users",
+    "reports": "Reports",
+    "audit": "Audit log",
+    "privacy": "Privacy",
+    "poster": "Poster & TV",
+    "newToken": "New token",
+    "queues": "Queues",
+    "doctorConsole": "Doctor console"
+  },
+  "priority": {
+    "NORMAL": "Normal",
+    "ELDERLY": "Elderly (60+)",
+    "PREGNANT": "Pregnant",
+    "DISABLED": "Disabled",
+    "EMERGENCY": "Emergency"
+  },
+  "status": {
+    "WAITING": "Waiting",
+    "CALLED": "Called",
+    "IN_CONSULT": "In consult",
+    "SKIPPED": "Skipped",
+    "NO_SHOW": "No-show",
+    "DONE": "Done",
+    "CANCELLED": "Cancelled",
+    "tooMany": "Too many requests. Please wait a minute and try again.",
+    "oldTitle": "This token is from an earlier day",
+    "oldDetail": "Please get a new token at the registration desk.",
+    "calledTitle": "It is your turn!",
+    "calledRoom": "Please go to {room} now.",
+    "calledDoctor": "Please go to the doctor now.",
+    "consultTitle": "You are with the doctor",
+    "consultDetail": "Thank you for waiting.",
+    "skippedTitle": "You were skipped for now",
+    "skippedDetail": "Please stay nearby. About {n, plural, one {# patient} other {# patients}} will be called before you.",
+    "nextTitle": "You are next",
+    "waitTitle": "Please wait",
+    "nextDetail": "Stay close to the doctor's room.",
+    "waitDetail": "{n, plural, one {# patient is} other {# patients are}} ahead of you. About {minutes} minutes.",
+    "doneTitle": "Your visit is complete",
+    "doneDetail": "Thank you. Get well soon.",
+    "noShowTitle": "You were not here when called",
+    "cancelledTitle": "This token was cancelled",
+    "deskDetail": "Please meet the registration desk.",
+    "yourToken": "Your token",
+    "tokenAria": "Token {label}",
+    "place": "Your place",
+    "waitingTime": "Waiting time",
+    "minutes": "{n} min",
+    "offline": "No connection. Trying again…",
+    "updated": "Updated {time}. This page updates by itself.",
+    "updatesByItself": "This page updates by itself."
+  },
+  "sex": {
+    "M": "Male",
+    "F": "Female",
+    "O": "Other"
+  },
+  "visitType": {
+    "NEW": "New",
+    "FOLLOW_UP": "Follow-up"
+  },
+  "errors": {
+    "BAD_JSON": "The request was not valid.",
+    "BAD_REFERENCE": "One of the choices is no longer available. Please reload the page.",
+    "DOCTOR_DEPARTMENT_MISMATCH": "The doctor belongs to a different department.",
+    "NOT_A_DOCTOR": "The user must have the doctor role.",
+    "ROOM_DEPARTMENT_MISMATCH": "The room belongs to a different department.",
+    "SAME_PASSWORD": "Choose a password different from the current one.",
+    "SELF_LOCKOUT": "You cannot change your own role or deactivate yourself.",
+    "VALIDATION": "Please check the details you entered.",
+    "WRONG_PASSWORD": "Current password is incorrect.",
+    "UNAUTHENTICATED": "Please log in.",
+    "FORBIDDEN": "You do not have permission to do this.",
+    "NOT_YOUR_PATIENT": "This patient was called by another doctor.",
+    "NO_DOCTOR_PROFILE": "Your doctor profile is not set up. Ask the admin.",
+    "PASSWORD_CHANGE_REQUIRED": "You must change your password first.",
+    "NOT_FOUND": "Not found. Please reload the page.",
+    "HAS_DOCTOR_PROFILE": "This user has a doctor profile. Remove it before changing the role.",
+    "QUEUE_EMPTY": "Nobody is waiting.",
+    "RATE_LIMITED": "Too many tries. Please wait a little, or use the registration desk.",
+    "CONFLICT": "This was changed by someone else. Please reload the page.",
+    "DUPLICATE": "This already exists.",
+    "INTERNAL": "Something went wrong on the server.",
+    "NETWORK": "Could not reach the server. Check the connection and try again.",
+    "INVALID_MOVE": "This token cannot be changed that way now. Please reload the page.",
+    "CURRENT_PATIENT_ACTIVE": "The current patient has been called. Start the consult, skip, or mark no-show first."
+  },
+  "login": {
+    "metaTitle": "Log in",
+    "title": "Staff login",
+    "passwordChanged": "Password changed. Please log in again with the new password.",
+    "phone": "Phone number",
+    "password": "Password",
+    "wrong": "Wrong phone number or password.",
+    "tooMany": "Too many tries. Please wait 15 minutes, or ask the admin to help.",
+    "submit": "Log in",
+    "submitting": "Logging in…"
+  },
+  "changePassword": {
+    "metaTitle": "Change password",
+    "title": "Change password",
+    "mismatch": "The new passwords do not match.",
+    "failed": "Could not change the password.",
+    "forced": "For safety, choose a new password before you continue.",
+    "current": "Current password",
+    "new": "New password",
+    "hint": "At least 8 characters.",
+    "repeat": "Repeat new password",
+    "submit": "Change password",
+    "saving": "Saving…"
+  },
+  "titles": {
+    "newToken": "New token",
+    "doctorConsole": "Doctor console",
+    "queues": "Today's queues",
+    "admin": "Setup",
+    "departments": "Departments",
+    "rooms": "Rooms",
+    "doctors": "Doctors",
+    "sessions": "OPD sessions",
+    "users": "Users",
+    "poster": "Poster & TV",
+    "reports": "Reports",
+    "audit": "Audit log",
+    "privacy": "Privacy",
+    "checkin": "Check in",
+    "status": "Your token",
+    "display": "Queue display",
+    "health": "System health",
+    "home": "Free OPD token and queue system"
+  },
+  "desk": {
+    "title": "Registration desk",
+    "somethingWrong": "Something went wrong.",
+    "noEarlier": "No earlier visit found. Fill in the details below.",
+    "formTitle": "New token",
+    "patientPhone": "Patient phone number",
+    "findEarlier": "Find earlier visit",
+    "patientsFound": "Patients found",
+    "use": "Use {name}, {age} {sex}",
+    "returning": "Returning patient selected.",
+    "notThis": "Not this patient",
+    "name": "Name",
+    "age": "Age",
+    "sex": "Sex",
+    "choose": "Choose…",
+    "abha": "ABHA number (optional)",
+    "visit": "Visit",
+    "department": "Department",
+    "doctor": "Doctor",
+    "anyDoctor": "Any doctor",
+    "priority": "Priority",
+    "consentTick": "I have read this notice to the patient and they agree.",
+    "creating": "Creating…",
+    "create": "Create token",
+    "youAreNext": "You are next",
+    "aboutMin": "About {n} min",
+    "created": "Token created",
+    "tokenAria": "Token {label}",
+    "ahead": "{n} ahead",
+    "printSlip": "Print slip",
+    "newToken": "New token",
+    "qrAlt": "QR code for the token status page",
+    "scanFollow": "Scan to follow the queue",
+    "scanTurn": "Scan to see your turn"
+  },
+  "doctor": {
+    "title": "Doctor console",
+    "noProfile": "Your doctor profile is not set up yet. Ask the admin to add it under Admin, Doctors.",
+    "somethingWrong": "Something went wrong.",
+    "doneToday": "{n} done today",
+    "waitingN": "{n} waiting",
+    "calledWaiting": "Called, waiting for the patient",
+    "inConsultation": "In consultation",
+    "noCurrent": "No current patient",
+    "followUpVisit": "Follow-up",
+    "newVisit": "New visit",
+    "recalled": "recalled {n}×",
+    "startConsult": "Start consult",
+    "recall": "Recall",
+    "skip": "Skip",
+    "noShow": "No-show",
+    "complete": "Complete",
+    "completeNext": "Complete and call next",
+    "next": "Next",
+    "beforeNext": "Start, skip or mark no-show before calling the next patient.",
+    "nobody": "Nobody is waiting.",
+    "waitingTitle": "Waiting ({n})",
+    "skippedEarlier": "Skipped earlier"
+  },
+  "queues": {
+    "title": "Today's queues",
+    "somethingWrong": "Something went wrong.",
+    "noDepartments": "No active departments.",
+    "counts": "{waiting} waiting · {withDoctor} with doctor · {done} done · {noShow} no-show · {cancelled} cancelled · {total} total",
+    "nobody": "Nobody is waiting.",
+    "doctorFor": "Doctor for {label}",
+    "anyDoctor": "Any doctor",
+    "confirmCancel": "Cancel token {label}?",
+    "cancel": "Cancel"
+  },
+  "admin": {
+    "home": {
+      "title": "Setup",
+      "departments": "Departments",
+      "departmentsHint": "Names, token prefix, colour",
+      "rooms": "Rooms",
+      "roomsHint": "Consulting rooms per department",
+      "doctors": "Doctors",
+      "doctorsHint": "Doctor profiles and rooms",
+      "sessions": "OPD sessions",
+      "sessionsHint": "Weekly timetable",
+      "users": "Users",
+      "usersHint": "Admins, clerks, doctors, passwords"
+    },
+    "departments": {
+      "title": "Departments",
+      "noun": "department",
+      "intro": "The token prefix (for example MED in MED-034) cannot be changed after the department is created.",
+      "prefix": "Prefix",
+      "nameEn": "Name (English)",
+      "nameHi": "Name (Hindi)",
+      "colour": "Colour",
+      "active": "Active",
+      "tokenPrefix": "Token prefix",
+      "prefixHelp": "2 to 5 letters, for example MED."
+    },
+    "rooms": {
+      "title": "Rooms",
+      "noun": "room",
+      "intro": "The department of a room cannot be changed after it is created.",
+      "room": "Room",
+      "department": "Department",
+      "roomName": "Room name"
+    },
+    "doctors": {
+      "title": "Doctors",
+      "noun": "doctor",
+      "intro": "First add a user with the Doctor role under Users, then create the doctor profile here. The login and department cannot be changed afterwards.",
+      "displayName": "Display name",
+      "login": "Login",
+      "department": "Department",
+      "room": "Room",
+      "doctorLogin": "Doctor login",
+      "noFreeUsers": "No doctor-role users without a profile. Add one under Users.",
+      "displayNameHelp": "Shown to patients, for example Dr. Anil Sharma.",
+      "roomHelp": "Must be a room of the doctor's department."
+    },
+    "sessions": {
+      "title": "OPD sessions",
+      "noun": "session",
+      "intro": "The weekly timetable, for example Medicine, Monday to Saturday, 09:00 to 13:00. Add one session per day.",
+      "days": {
+        "0": "Sunday",
+        "1": "Monday",
+        "2": "Tuesday",
+        "3": "Wednesday",
+        "4": "Thursday",
+        "5": "Friday",
+        "6": "Saturday"
+      },
+      "timeRange": "{start} to {end}",
+      "department": "Department",
+      "day": "Day",
+      "time": "Time",
+      "doctor": "Doctor",
+      "maxTokens": "Max tokens",
+      "doctorHelp": "Optional. Must belong to the same department.",
+      "start": "Start",
+      "end": "End",
+      "maxTokensHelp": "Optional daily limit."
+    },
+    "users": {
+      "title": "Users",
+      "noun": "user",
+      "intro": "An admin-set password is temporary: the person must choose their own when they first log in. You cannot change your own role or deactivate yourself.",
+      "name": "Name",
+      "phone": "Phone",
+      "roleLabel": "Role",
+      "department": "Department",
+      "active": "Active",
+      "mustChange": "Must change password",
+      "fullName": "Full name",
+      "phoneLogin": "Phone number (login)",
+      "phoneHelp": "10-digit mobile number.",
+      "password": "Password",
+      "passwordHelp": "At least 8 characters. When editing, leave blank to keep the current password.",
+      "role": {
+        "ADMIN": "Admin",
+        "CLERK": "Clerk (registration desk)",
+        "DOCTOR": "Doctor"
+      },
+      "departmentHelp": "Optional. Doctors get theirs from the Doctors screen."
+    },
+    "poster": {
+      "title": "Poster and TV screens",
+      "noAppUrl": "APP_URL is not set in the .env file, so links and the QR code cannot be made. Set it to the server address (for example http://192.168.1.10:3000) and restart.",
+      "noKey": "DISPLAY_KEY is not set in the .env file, so TV screens cannot open the board.",
+      "tvLinks": "TV board links",
+      "tvHelp": "Open one of these addresses in the browser of the TV or Android TV stick, then press OK once to turn on the sound. Anyone with the link can see the board, so keep it to staff.",
+      "allDepartments": "All departments",
+      "print": "Print check-in poster",
+      "qrAlt": "QR code for check-in",
+      "qrNeedsUrl": "QR code needs APP_URL."
+    },
+    "audit": {
+      "title": "Audit log",
+      "intro": "Who did what and when: logins, every queue action, setup changes, exports and privacy requests. It never holds patient names or phone numbers. Times are hospital time ({tz}).",
+      "from": "From",
+      "to": "To",
+      "actionStarts": "Action starts with",
+      "actionExample": "for example queue.",
+      "filter": "Filter",
+      "clear": "Clear",
+      "summary": "{total} entries · page {page} of {pages}",
+      "col": {
+        "time": "Time",
+        "who": "Who",
+        "action": "Action",
+        "item": "Item",
+        "ip": "IP"
+      },
+      "none": "Nothing found.",
+      "pages": "Pages",
+      "newer": "← Newer",
+      "older": "Older →"
+    },
+    "privacy": {
+      "title": "Privacy",
+      "retentionTitle": "Data retention",
+      "retentionText": "Each night at 02:30, patients not seen for <b>{days} days</b> lose their name, phone number and ABHA number. Visit counts and times are kept, so reports stay correct. Change <code>RETENTION_DAYS</code> in the .env file to use a different number of days.",
+      "retentionStatus": "{anonymised} of {total} patients are anonymised. Last run: {lastRun}.",
+      "notYet": "not yet (it also runs 2 minutes after the app starts)",
+      "consentTitle": "Consent notice ({version}) · {count} consents recorded",
+      "consentHelp": "This is shown at the desk and on the check-in page. Each token stores the version the patient agreed to, the time, and whether it was at the desk or on their own phone.",
+      "tools": {
+        "somethingWrong": "Something went wrong.",
+        "notFound": "No patient found with this phone number.",
+        "confirmErase": "Erase the name, phone number and ABHA number of {name}? This cannot be undone. Visit counts are kept without a name.",
+        "erased": "The data of {name} was erased.",
+        "title": "A patient's data request",
+        "help": "When a patient asks to see or delete their data: find them by their full phone number, download everything held about them, or erase it. Both actions are written to the audit log.",
+        "find": "Find",
+        "visits": "{n, plural, one {# visit} other {# visits}}",
+        "firstSeen": "first seen {date}",
+        "download": "Download data (JSON)",
+        "erase": "Erase data"
+      }
+    },
+    "reports": {
+      "title": "Reports",
+      "departments": "Departments",
+      "chartSummary": "Tokens per day from {from} to {to}: {total} in total.",
+      "dayTip": "{date}: {total} tokens",
+      "minutes": "{n} min",
+      "wait": "Wait",
+      "consult": "Consult",
+      "col": {
+        "tokens": "Tokens",
+        "done": "Done",
+        "noShow": "No-show",
+        "cancelled": "Cancelled",
+        "open": "Still open",
+        "self": "Self check-in",
+        "avgWait": "Avg wait",
+        "avgConsult": "Avg consult"
+      },
+      "from": "From",
+      "to": "To",
+      "show": "Show",
+      "today": "Today",
+      "last7": "Last 7 days",
+      "last30": "Last 30 days",
+      "downloadCsv": "Download CSV",
+      "range": "{from} to {to}.",
+      "explain": "Wait is the time from getting a token to being called first; consult is from Start to Complete (consults over 3 hours are ignored). The CSV has one row per token and no patient names or phone numbers.",
+      "summary": "Summary",
+      "tokens": "Tokens",
+      "done": "Done",
+      "noShows": "No-shows",
+      "avgWait": "Average wait",
+      "avgConsult": "Average consult",
+      "selfCheckIn": "Self check-in",
+      "noTokens": "No tokens in this period.",
+      "perDay": "Tokens per day",
+      "timesByDept": "Average time by department",
+      "byDepartment": "By department",
+      "allDepartments": "All departments",
+      "byDay": "By day",
+      "rangeError": {
+        "format": "Dates must look like 2026-11-24.",
+        "order": "The start date is after the end date.",
+        "long": "Choose at most {max} days at a time."
+      }
+    }
+  },
+  "checkin": {
+    "title": "Get your token",
+    "notOpen": "Check-in is not open yet. Please use the registration desk.",
+    "pickDepartment": "Please choose a department.",
+    "pickSex": "Please choose male, female or other.",
+    "failed": "Something went wrong. Please try again.",
+    "network": "Could not reach the hospital server. Please try again or use the desk.",
+    "name": "Name",
+    "phone": "Mobile number",
+    "age": "Age",
+    "sex": "Sex",
+    "department": "Department",
+    "agree": "I agree",
+    "wait": "Please wait…",
+    "submit": "Get token"
+  },
+  "crud": {
+    "somethingWrong": "Something went wrong.",
+    "confirmDelete": "Delete this {noun}? This cannot be undone.",
+    "add": "Add {noun}",
+    "newTitle": "New {noun}",
+    "editTitle": "Edit {noun}",
+    "choose": "Choose…",
+    "empty": "No {noun} yet.",
+    "delete": "Delete"
+  },
+  "health": {
+    "title": "QueueCare health",
+    "app": "App",
+    "running": "running",
+    "database": "Database",
+    "connected": "connected",
+    "unreachable": "unreachable",
+    "counts": "{departments} departments, {users} users, {tokens} tokens",
+    "runSeed": "Run the seed to load demo data."
+  },
+  "landing": {
+    "skip": "Skip to content",
+    "login": "Staff login",
+    "hero": {
+      "title": "No more standing in OPD lines.",
+      "sub": "Free, open-source token and queue system for hospitals and clinics. Set up in one afternoon.",
+      "demo": "Try the live demo",
+      "install": "Install free",
+      "tvLabel": "Example of the waiting-room TV board: token MED-034, Room 4",
+      "tvNow": "Now serving",
+      "tvDept": "Medicine",
+      "tvRoom": "Room 4",
+      "tvNext": "Next"
+    },
+    "problem": {
+      "title": "Waiting is the real problem",
+      "intro": "When registration moves from paper to a token on screen, waits fall. These are reported figures from India.",
+      "a": {
+        "from": "50",
+        "to": "4",
+        "unit": "minutes",
+        "text": "Registration wait at pilot hospitals after QR-code Scan and Share registration, with about 4.06 lakh patients in 347 hospitals by February 2023. This is an official claim of the National Health Authority, not an independent study.",
+        "source": "Source: Medical Dialogues, 14 Feb 2023"
+      },
+      "b": {
+        "from": "58",
+        "to": "35",
+        "unit": "minutes",
+        "text": "Average wait before seeing a doctor in Bihar after all 592 government facilities moved to electronic OPD registration (August 2024 to May 2025).",
+        "source": "Source: ThePrint, 10 Jun 2025"
+      }
+    },
+    "how": {
+      "title": "How it works",
+      "s1": {
+        "t": "Get a token",
+        "d": "At the desk, or by scanning a QR code on the wall with your own phone. It takes three fields."
+      },
+      "s2": {
+        "t": "Wait anywhere",
+        "d": "Sit, step out for tea, or wait at home nearby. Your phone shows how many people are ahead of you."
+      },
+      "s3": {
+        "t": "Get called on screen",
+        "d": "Your token appears on the TV board with the room number, and a voice calls it in Hindi and English."
+      }
+    },
+    "features": {
+      "title": "Everything an OPD needs",
+      "tokens": {
+        "t": "Digital tokens",
+        "d": "Numbered per department each day, with priority for emergencies, elderly, pregnant and disabled patients."
+      },
+      "tv": {
+        "t": "TV display with voice",
+        "d": "Large board for any TV or Android TV stick, with a chime and a spoken call in Hindi and English. Token numbers only, never names."
+      },
+      "doctor": {
+        "t": "Doctor console",
+        "d": "One big Next button, plus recall, skip and no-show. Built for a busy room."
+      },
+      "qr": {
+        "t": "Self check-in by QR",
+        "d": "Patients scan a poster, enter name, phone and age, and get a token on their own phone."
+      },
+      "lang": {
+        "t": "Hindi and English",
+        "d": "Every screen works in both languages, and more can be added by translating one file."
+      },
+      "reports": {
+        "t": "Reports and export",
+        "d": "Daily counts, average wait and consult time, and a CSV export that holds no patient names."
+      }
+    },
+    "who": {
+      "title": "Made for",
+      "district": "District hospitals",
+      "chc": "Community health centres",
+      "nursing": "Nursing homes",
+      "clinics": "Private clinics"
+    },
+    "privacy": {
+      "title": "Privacy by design",
+      "big": "Names never shown on screen. Your data stays on your server.",
+      "d": "QueueCare runs on a computer in your own hospital. There is no cloud account, no tracking and no outside service. Patient names and phone numbers are removed automatically after a set number of days, and every action is written to an audit log."
+    },
+    "install": {
+      "title": "Install in three commands",
+      "d": "You need one computer with Docker (2 GB of memory is enough). Then open the address of that computer on the desk PCs, phones and the TV.",
+      "guide": "Read the ADMIN_GUIDE.md",
+      "guidePlain": "Read ADMIN_GUIDE.md in the project folder",
+      "copyNote": "Run these in a terminal.",
+      "repoPlaceholder": "<repository-address>"
+    },
+    "faq": {
+      "title": "Questions",
+      "q1": {
+        "q": "Is it really free?",
+        "a": "Yes. QueueCare is open source under the MIT licence. There are no fees, no subscription and no paid services inside it. You only need a computer to run it."
+      },
+      "q2": {
+        "q": "Do we need internet?",
+        "a": "No. It works on the hospital's own Wi-Fi or LAN, because the server is a computer in the building. The spoken call uses the text-to-speech voice already in the TV or browser. Internet is only needed to download it the first time."
+      },
+      "q3": {
+        "q": "Does it work with ABDM?",
+        "a": "You can note a patient's ABHA number at the desk. QueueCare does not connect to ABDM services by itself; it only keeps the number you type, if the patient chooses to give it."
+      },
+      "q4": {
+        "q": "What hardware do we need?",
+        "a": "One computer or small server with 2 GB of memory to run it, a desk PC or phone for each clerk and doctor, and any TV or Android TV stick with a browser for the board. A 58 mm thermal printer is optional for token slips."
+      }
+    },
+    "footer": {
+      "licence": "MIT licence",
+      "github": "GitHub",
+      "contact": "Contact",
+      "tag": "QueueCare is free software for Indian hospitals."
+    }
+  }
+}

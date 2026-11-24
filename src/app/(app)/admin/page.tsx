@@ -1,12 +1,15 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
+import { pageTitle } from "@/i18n/meta";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { db } from "@/lib/db";
 import { requirePageRole } from "@/lib/page-auth";
 
-export const metadata = { title: "Admin · QueueCare" };
+export const generateMetadata = pageTitle("admin");
 
 export default async function AdminHome() {
   await requirePageRole(["ADMIN"]);
+  const t = await getTranslations("admin.home");
   const [departments, rooms, doctors, sessions, users] = await Promise.all([
     db.department.count(),
     db.room.count(),
@@ -15,15 +18,15 @@ export default async function AdminHome() {
     db.user.count(),
   ]);
   const sections = [
-    { href: "/admin/departments", label: "Departments", count: departments, hint: "Names, token prefix, colour" },
-    { href: "/admin/rooms", label: "Rooms", count: rooms, hint: "Consulting rooms per department" },
-    { href: "/admin/doctors", label: "Doctors", count: doctors, hint: "Doctor profiles and rooms" },
-    { href: "/admin/sessions", label: "OPD sessions", count: sessions, hint: "Weekly timetable" },
-    { href: "/admin/users", label: "Users", count: users, hint: "Admins, clerks, doctors, passwords" },
+    { href: "/admin/departments", label: t("departments"), count: departments, hint: t("departmentsHint") },
+    { href: "/admin/rooms", label: t("rooms"), count: rooms, hint: t("roomsHint") },
+    { href: "/admin/doctors", label: t("doctors"), count: doctors, hint: t("doctorsHint") },
+    { href: "/admin/sessions", label: t("sessions"), count: sessions, hint: t("sessionsHint") },
+    { href: "/admin/users", label: t("users"), count: users, hint: t("usersHint") },
   ];
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">Setup</h1>
+      <h1 className="text-2xl font-bold">{t("title")}</h1>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {sections.map((s) => (
           <Link key={s.href} href={s.href} className="rounded-lg focus-visible:outline-2 focus-visible:outline-primary">

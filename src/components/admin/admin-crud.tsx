@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input, Label, Select } from "@/components/ui/form";
+import { apiErrorText } from "@/lib/api-error-text";
 
 export type Row = Record<string, unknown> & { id: string };
 
@@ -70,8 +72,8 @@ function buildPayload(fields: FieldDef[], values: Values, mode: Mode): Record<st
   return payload;
 }
 
-function Cell({ value, kind }: { value: unknown; kind?: ColumnDef["kind"] }) {
-  if (kind === "bool") return <span>{value ? "Yes" : "No"}</span>;
+function Cell({ value, kind, yes, no }: { value: unknown; kind?: ColumnDef["kind"]; yes: string; no: string }) {
+  if (kind === "bool") return <span>{value ? yes : no}</span>;
   if (kind === "color" && typeof value === "string") {
     return (
       <span className="inline-flex items-center gap-2">
@@ -84,6 +86,7 @@ function Cell({ value, kind }: { value: unknown; kind?: ColumnDef["kind"] }) {
 }
 
 export function AdminCrud(props: {
+  /** The thing being managed, already in the user's language (for example "department" or "विभाग"). */
   noun: string;
   endpoint: string;
   rows: Row[];
@@ -94,6 +97,10 @@ export function AdminCrud(props: {
 }) {
   const { noun, endpoint, rows, columns, fields, canDelete } = props;
   const router = useRouter();
+  const t = useTranslations("crud");
+  const tc = useTranslations("common");
+  const te = useTranslations("errors");
+  const locale = useLocale();
   const [editing, setEditing] = useState<Row | "new" | null>(null);
   const [values, setValues] = useState<Values>({});
   const [error, setError] = useState<string | null>(null);
@@ -118,13 +125,13 @@ export function AdminCrud(props: {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(data?.error?.message ?? "Something went wrong.");
+        setError(apiErrorText(te, locale, data, t("somethingWrong")));
         return false;
       }
       router.refresh();
       return true;
     } catch {
-      setError("Could not reach the server.");
+      setError(te("NETWORK"));
       return false;
     } finally {
       setBusy(false);
@@ -142,7 +149,7 @@ export function AdminCrud(props: {
   }
 
   async function onDelete(row: Row) {
-    if (!window.confirm(`Delete this ${noun}? This cannot be undone.`)) return;
+    if (!window.confirm(t("confirmDelete", { noun }))) return;
     await send("DELETE", `${endpoint}/${row.id}`);
   }
 
@@ -153,14 +160,14 @@ export function AdminCrud(props: {
       <div className="flex items-center justify-between gap-4">
         <p className="text-sm text-muted-foreground">{props.intro}</p>
         <Button onClick={() => open("new")} disabled={editing !== null}>
-          Add {noun}
+          {t("add", { noun })}
         </Button>
       </div>
 
       {editing !== null && (
         <Card>
           <CardHeader>
-            <CardTitle>{editing === "new" ? `New ${noun}` : `Edit ${noun}`}</CardTitle>
+            <CardTitle>{editing === "new" ? t("newTitle", { noun }) : t("editTitle", { noun })}</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={onSubmit} className="grid gap-4 sm:grid-cols-2">
@@ -194,7 +201,7 @@ export function AdminCrud(props: {
                         value={String(values[f.name] ?? "")}
                         onChange={(e) => setValues({ ...values, [f.name]: e.target.value })}
                       >
-                        <option value="">{f.nullable || !required ? "None" : "Choose…"}</option>
+                        <option value="">{f.nullable || !required ? tc("none") : t("choose")}</option>
                         {f.options?.map((o) => (
                           <option key={o.value} value={o.value}>
                             {o.label}
@@ -224,10 +231,10 @@ export function AdminCrud(props: {
               )}
               <div className="flex gap-2 sm:col-span-2">
                 <Button type="submit" disabled={busy}>
-                  {busy ? "Saving…" : "Save"}
+                  {busy ? tc("saving") : tc("save")}
                 </Button>
                 <Button type="button" variant="outline" onClick={() => setEditing(null)} disabled={busy}>
-                  Cancel
+                  {tc("cancel")}
                 </Button>
               </div>
             </form>
@@ -251,7 +258,7 @@ export function AdminCrud(props: {
                 </th>
               ))}
               <th scope="col" className="px-4 py-2 text-right font-medium">
-                Actions
+                {tc("actions")}
               </th>
             </tr>
           </thead>
@@ -259,7 +266,7 @@ export function AdminCrud(props: {
             {rows.length === 0 && (
               <tr>
                 <td colSpan={columns.length + 1} className="px-4 py-6 text-center text-muted-foreground">
-                  No {noun}s yet.
+                  {t("empty", { noun })}
                 </td>
               </tr>
             )}
@@ -267,16 +274,16 @@ export function AdminCrud(props: {
               <tr key={row.id} className="border-t border-border">
                 {columns.map((c) => (
                   <td key={c.key} className="px-4 py-2">
-                    <Cell value={row[c.key]} kind={c.kind} />
+                    <Cell value={row[c.key]} kind={c.kind} yes={tc("yes")} no={tc("no")} />
                   </td>
                 ))}
                 <td className="space-x-2 px-4 py-2 text-right whitespace-nowrap">
                   <Button size="sm" variant="outline" onClick={() => open(row)} disabled={editing !== null}>
-                    Edit
+                    {tc("edit")}
                   </Button>
                   {canDelete && (
                     <Button size="sm" variant="destructive" onClick={() => onDelete(row)} disabled={busy}>
-                      Delete
+                      {t("delete")}
                     </Button>
                   )}
                 </td>

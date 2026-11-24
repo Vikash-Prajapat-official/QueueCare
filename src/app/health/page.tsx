@@ -1,7 +1,10 @@
+import { getTranslations } from "next-intl/server";
 import { db } from "@/lib/db";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { pageTitle } from "@/i18n/meta";
 
 export const dynamic = "force-dynamic";
+export const generateMetadata = pageTitle("health");
 
 async function check() {
   try {
@@ -19,27 +22,27 @@ async function check() {
 
 // Shows only up/down status and row counts. No names or phone numbers.
 export default async function HealthPage() {
-  const r = await check();
+  const [r, t] = await Promise.all([check(), getTranslations("health")]);
   return (
     <main className="mx-auto max-w-xl p-6">
       <Card>
         <CardHeader>
-          <CardTitle>QueueCare health</CardTitle>
+          <CardTitle>{t("title")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           <p>
-            App: <strong className="text-primary">running</strong>
+            {t("app")}: <strong className="text-primary">{t("running")}</strong>
           </p>
           <p>
-            Database:{" "}
+            {t("database")}:{" "}
             <strong className={r.ok ? "text-primary" : "text-destructive"}>
-              {r.ok ? "connected" : "unreachable"}
+              {r.ok ? t("connected") : t("unreachable")}
             </strong>
           </p>
           {r.ok && (
             <p className="text-sm text-muted-foreground">
-              {r.departments} departments, {r.users} users, {r.tokens} tokens
-              {r.departments === 0 && ". Run the seed to load demo data."}
+              {t("counts", { departments: r.departments, users: r.users, tokens: r.tokens })}
+              {r.departments === 0 && ` ${t("runSeed")}`}
             </p>
           )}
         </CardContent>

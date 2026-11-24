@@ -8,7 +8,7 @@ import { DisplayBoard } from "./display-board";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Now serving · QueueCare",
+  title: "Now serving · अभी बुलाया जा रहा है",
   robots: { index: false, follow: false },
   // The display key is in the URL, so never pass it on to other sites.
   referrer: "no-referrer",
@@ -28,7 +28,10 @@ export default async function DisplayPage({
   if (!ids || !isValidDisplayKey(key)) {
     return (
       <main className="fixed inset-0 flex items-center justify-center bg-black p-8 text-center text-white">
-        <p className="text-3xl">This screen needs a valid display link. Ask the hospital admin for it.</p>
+        <div className="space-y-4 text-3xl">
+          <p>This screen needs a valid display link. Ask the hospital admin for it.</p>
+          <p lang="hi">इस स्क्रीन के लिए सही डिस्प्ले लिंक चाहिए। अस्पताल के एडमिन से माँगें।</p>
+        </div>
       </main>
     );
   }

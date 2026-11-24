@@ -2,6 +2,7 @@
 // Colours are the validated categorical palette of the dataviz skill, given to departments in a
 // fixed order. Every chart has direct labels or a table next to it, so colour is never the only cue.
 
+import { useLocale, useTranslations } from "next-intl";
 import type { DepartmentInfo, Report, Stats } from "@/lib/reports";
 
 const SURFACE = "#fcfcfb";
@@ -20,13 +21,20 @@ function niceMax(value: number): number {
   return 10 * step;
 }
 
+/** Department name in the reader's language. */
+export function deptLabel(d: DepartmentInfo, locale: string): string {
+  return locale === "hi" && d.nameHi ? d.nameHi : d.nameEn;
+}
+
 export function Legend({ departments }: { departments: DepartmentInfo[] }) {
+  const t = useTranslations("admin.reports");
+  const locale = useLocale();
   return (
-    <ul className="flex flex-wrap gap-x-4 gap-y-1 text-sm" aria-label="Departments">
+    <ul className="flex flex-wrap gap-x-4 gap-y-1 text-sm" aria-label={t("departments")}>
       {departments.map((d, i) => (
         <li key={d.id} className="flex items-center gap-1.5">
           <span className="inline-block size-3 rounded-sm" style={{ backgroundColor: seriesColor(i) }} />
-          {d.tokenPrefix} · {d.nameEn}
+          {d.tokenPrefix} · {deptLabel(d, locale)}
         </li>
       ))}
     </ul>
@@ -35,6 +43,7 @@ export function Legend({ departments }: { departments: DepartmentInfo[] }) {
 
 /** Tokens issued per day, stacked by department. */
 export function TokensPerDayChart({ report }: { report: Report }) {
+  const t = useTranslations("admin.reports");
   const W = 760;
   const H = 280;
   const m = { top: 12, right: 8, bottom: 30, left: 38 };
@@ -48,16 +57,16 @@ export function TokensPerDayChart({ report }: { report: Report }) {
   const labelEvery = Math.max(1, Math.ceil(days.length / 8));
   const ticks = [0, 1, 2, 3, 4].map((i) => (max / 4) * i);
 
-  const summary = `Tokens per day from ${report.from} to ${report.to}: ${report.totals.total} in total.`;
+  const summary = t("chartSummary", { from: report.from, to: report.to, total: report.totals.total });
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={summary} className="h-auto w-full">
       <title>{summary}</title>
-      {ticks.map((t) => (
-        <g key={t}>
-          <line x1={m.left} x2={W - m.right} y1={y(t)} y2={y(t)} stroke={GRID} strokeWidth={1} />
-          <text x={m.left - 6} y={y(t) + 4} textAnchor="end" fontSize={11} fill={MUTED}>
-            {Number.isInteger(t) ? t : t.toFixed(1)}
+      {ticks.map((tick) => (
+        <g key={tick}>
+          <line x1={m.left} x2={W - m.right} y1={y(tick)} y2={y(tick)} stroke={GRID} strokeWidth={1} />
+          <text x={m.left - 6} y={y(tick) + 4} textAnchor="end" fontSize={11} fill={MUTED}>
+            {Number.isInteger(tick) ? tick : tick.toFixed(1)}
           </text>
         </g>
       ))}
@@ -66,7 +75,8 @@ export function TokensPerDayChart({ report }: { report: Report }) {
         const x = m.left + i * slot + (slot - barW) / 2;
         let acc = 0;
         const parts = day.departments.map((s, di) => ({ s, di }));
-        const tip = `${day.date}: ${day.totals.total} tokens` +
+        const tip =
+          t("dayTip", { date: day.date, total: day.totals.total }) +
           parts.filter((p) => p.s.total > 0).map((p) => `, ${report.departments[p.di]?.tokenPrefix} ${p.s.total}`).join("");
         return (
           <g key={day.date}>
@@ -103,20 +113,21 @@ export function TokensPerDayChart({ report }: { report: Report }) {
   );
 }
 
-const minutes = (v: number | null) => (v === null ? "—" : `${v} min`);
-
 /** Average wait and consult time per department as labelled horizontal bars. */
 export function TimesByDepartment({ report }: { report: Report }) {
+  const t = useTranslations("admin.reports");
+  const locale = useLocale();
+  const minutes = (v: number | null) => (v === null ? "—" : t("minutes", { n: v }));
   const rows = report.byDepartment.map((s, i) => ({ s, i, d: report.departments[i] as DepartmentInfo }));
   const longest = Math.max(1, ...rows.flatMap((r) => [r.s.avgWaitMinutes ?? 0, r.s.avgConsultMinutes ?? 0]));
 
   const Bar = ({ label, value, color }: { label: string; value: number | null; color: string }) => (
     <div className="flex items-center gap-2 text-sm">
-      <span className="w-16 text-muted-foreground">{label}</span>
+      <span className="w-20 text-muted-foreground">{label}</span>
       <div className="h-3 flex-1 rounded bg-muted">
         {value !== null && <div className="h-3 rounded" style={{ width: `${Math.max(2, (value / longest) * 100)}%`, backgroundColor: color }} />}
       </div>
-      <span className="w-16 text-right tabular-nums">{minutes(value)}</span>
+      <span className="w-20 text-right tabular-nums">{minutes(value)}</span>
     </div>
   );
 
@@ -126,10 +137,10 @@ export function TimesByDepartment({ report }: { report: Report }) {
         <div key={d.id} className="space-y-1">
           <p className="text-sm font-medium">
             <span className="mr-2 inline-block size-3 rounded-sm align-middle" style={{ backgroundColor: seriesColor(i) }} />
-            {d.tokenPrefix} · {d.nameEn}
+            {d.tokenPrefix} · {deptLabel(d, locale)}
           </p>
-          <Bar label="Wait" value={s.avgWaitMinutes} color={seriesColor(i)} />
-          <Bar label="Consult" value={s.avgConsultMinutes} color={seriesColor(i)} />
+          <Bar label={t("wait")} value={s.avgWaitMinutes} color={seriesColor(i)} />
+          <Bar label={t("consult")} value={s.avgConsultMinutes} color={seriesColor(i)} />
         </div>
       ))}
     </div>
@@ -137,14 +148,18 @@ export function TimesByDepartment({ report }: { report: Report }) {
 }
 
 export function StatTable({ rows }: { rows: { label: string; stats: Stats }[] }) {
+  const t = useTranslations("admin.reports");
+  const minutes = (v: number | null) => (v === null ? "—" : t("minutes", { n: v }));
+  const heads = ["tokens", "done", "noShow", "cancelled", "open", "self", "avgWait", "avgConsult"] as const;
   return (
     <div className="overflow-x-auto rounded-lg border border-border">
       <table className="w-full text-left text-sm">
         <thead className="bg-muted text-muted-foreground">
           <tr>
-            {["", "Tokens", "Done", "No-show", "Cancelled", "Still open", "Self check-in", "Avg wait", "Avg consult"].map((h) => (
+            <td className="px-3 py-2" />
+            {heads.map((h) => (
               <th key={h} scope="col" className="px-3 py-2 font-medium">
-                {h}
+                {t(`col.${h}`)}
               </th>
             ))}
           </tr>

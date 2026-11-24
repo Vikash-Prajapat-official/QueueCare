@@ -1,4 +1,6 @@
+import { getTranslations } from "next-intl/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { pageTitle } from "@/i18n/meta";
 import { CONSENT_NOTICE_VERSION, consentNotice, retentionDays } from "@/lib/consent";
 import { db } from "@/lib/db";
 import { requirePageRole } from "@/lib/page-auth";
@@ -6,11 +8,12 @@ import { hospitalTimezone } from "@/lib/report-service";
 import { formatLocal } from "@/lib/time";
 import { PrivacyTools } from "./privacy-tools";
 
-export const metadata = { title: "Privacy · QueueCare" };
+export const generateMetadata = pageTitle("privacy");
 export const dynamic = "force-dynamic";
 
 export default async function PrivacyPage() {
   await requirePageRole(["ADMIN"]);
+  const t = await getTranslations("admin.privacy");
   const days = retentionDays();
   const notice = consentNotice(days);
   const [timeZone, lastRun, anonymised, total, consents] = await Promise.all([
@@ -23,38 +26,38 @@ export default async function PrivacyPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Privacy</h1>
+      <h1 className="text-2xl font-bold">{t("title")}</h1>
 
       <Card>
         <CardHeader>
-          <CardTitle>Data retention</CardTitle>
+          <CardTitle>{t("retentionTitle")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-1 text-sm">
           <p>
-            Each night at 02:30, patients not seen for <strong>{days} days</strong> lose their name, phone number and ABHA
-            number. Visit counts and times are kept, so reports stay correct. Change <code>RETENTION_DAYS</code> in the .env
-            file to use a different number of days.
+            {t.rich("retentionText", {
+              days,
+              b: (chunks) => <strong>{chunks}</strong>,
+              code: (chunks) => <code>{chunks}</code>,
+            })}
           </p>
           <p className="text-muted-foreground">
-            {anonymised} of {total} patients are anonymised. Last run:{" "}
-            {lastRun ? `${formatLocal(lastRun.at, timeZone)} (${lastRun.entityId})` : "not yet (it also runs 2 minutes after the app starts)"}.
+            {t("retentionStatus", {
+              anonymised,
+              total,
+              lastRun: lastRun ? `${formatLocal(lastRun.at, timeZone)} (${lastRun.entityId})` : t("notYet"),
+            })}
           </p>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>
-            Consent notice ({CONSENT_NOTICE_VERSION}) · {consents} consents recorded
-          </CardTitle>
+          <CardTitle>{t("consentTitle", { version: CONSENT_NOTICE_VERSION, count: consents })}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 text-sm">
-          <p>{notice.en}</p>
-          <p>{notice.hi}</p>
-          <p className="text-muted-foreground">
-            This is shown at the desk and on the check-in page. Each token stores the version the patient agreed to, the
-            time, and whether it was at the desk or on their own phone.
-          </p>
+          <p lang="en">{notice.en}</p>
+          <p lang="hi">{notice.hi}</p>
+          <p className="text-muted-foreground">{t("consentHelp")}</p>
         </CardContent>
       </Card>
 

@@ -193,7 +193,7 @@ export function DisplayBoard({
       <main className="grid flex-1 gap-[1.2vw] p-[1.2vw] [grid-auto-rows:1fr] [grid-template-columns:repeat(auto-fit,minmax(min(100%,24rem),1fr))]">
         {state.rooms.length === 0 && (
           <p className="col-span-full self-center text-center text-[clamp(1.5rem,3vw,3rem)]">
-            No doctors are set up for this screen.
+            No doctors are set up for this screen. · इस स्क्रीन के लिए कोई डॉक्टर तय नहीं है।
           </p>
         )}
         {state.rooms.map((room) => {
@@ -265,13 +265,13 @@ export function DisplayBoard({
         ) : (
           <span>Sound on · आवाज़ चालू</span>
         )}
-        <span aria-label={`Connection ${status}`} className="flex items-center gap-2">
+        <span aria-label={`Connection ${status} · कनेक्शन`} className="flex items-center gap-2">
           <span
             className={`inline-block size-3 rounded-full ${
               status === "open" ? "bg-green-500" : status === "retrying" ? "bg-red-500" : "bg-yellow-500"
             }`}
           />
-          {status === "open" ? "Live" : status === "retrying" ? "Reconnecting…" : "Connecting…"}
+          {status === "open" ? "Live · चालू" : status === "retrying" ? "Reconnecting… · दोबारा जुड़ रहा है…" : "Connecting… · जुड़ रहा है…"}
         </span>
       </footer>
 

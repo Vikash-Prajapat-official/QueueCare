@@ -1,21 +1,7 @@
-// Display text shared by the desk and doctor screens (Hindi arrives with next-intl in Phase 6).
+// Values for priorities and statuses. Their names on screen come from messages/*.json
+// (keys "priority.<VALUE>" and "status.<VALUE>"), so they appear in the chosen language.
 
-export const PRIORITY_LABELS: Record<string, string> = {
-  NORMAL: "Normal",
-  ELDERLY: "Elderly (60+)",
-  PREGNANT: "Pregnant",
-  DISABLED: "Disabled",
-  EMERGENCY: "Emergency",
-};
+export const PRIORITIES = ["NORMAL", "ELDERLY", "PREGNANT", "DISABLED", "EMERGENCY"] as const;
+export type PriorityValue = (typeof PRIORITIES)[number];
 
-export const STATUS_LABELS: Record<string, string> = {
-  WAITING: "Waiting",
-  CALLED: "Called",
-  IN_CONSULT: "In consult",
-  SKIPPED: "Skipped",
-  NO_SHOW: "No-show",
-  DONE: "Done",
-  CANCELLED: "Cancelled",
-};
-
-export const PRIORITY_OPTIONS = Object.entries(PRIORITY_LABELS).map(([value, label]) => ({ value, label }));
+export const STATUSES = ["WAITING", "CALLED", "IN_CONSULT", "SKIPPED", "NO_SHOW", "DONE", "CANCELLED"] as const;

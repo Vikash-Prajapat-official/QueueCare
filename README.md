@@ -2,7 +2,13 @@
 
 Free, open-source OPD token and queue system for Indian hospitals and clinics. MIT licence.
 
-> Status: **Phase 5 of 7** (adds reports and CSV export, consent records, the nightly retention job, encrypted nightly backups, rate limits and the audit log screen). The landing page, Hindi for every screen and PWA, then tests, CI and the admin guide, arrive in later phases.
+> Status: **Phase 6 of 7** (adds the landing page at `/`, Hindi for every screen with an English / हिन्दी switch, and an installable app). Playwright tests, CI and the admin guide arrive in the last phase.
+
+## Languages and installing the app
+
+- Use the **English / हिन्दी** switch on any page. To add a language, copy `messages/en.json`, translate it and add the code in `src/i18n/config.ts`. `npm run i18n:check` finds missing text.
+- The landing page at `/` reads optional `GITHUB_URL`, `DEMO_URL` and `CONTACT_EMAIL` from `.env`.
+- Phones can install QueueCare ("Add to Home screen") only over HTTPS or on `localhost`; see the Caddy profile in DECISIONS.md. Pages and queue data are never stored on the phone.
 
 ## Backups
 

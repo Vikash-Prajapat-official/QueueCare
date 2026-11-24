@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input, Label } from "@/components/ui/form";
+import { apiErrorText } from "@/lib/api-error-text";
 
 interface Found {
   id: string;
@@ -14,16 +16,19 @@ interface Found {
   visits: number;
 }
 
-async function problem(res: Response): Promise<string> {
-  const data = await res.json().catch(() => ({}));
-  return data?.error?.message ?? "Something went wrong.";
-}
-
 export function PrivacyTools() {
+  const t = useTranslations("admin.privacy.tools");
+  const tc = useTranslations();
+  const te = useTranslations("errors");
+  const locale = useLocale();
   const [phone, setPhone] = useState("");
   const [found, setFound] = useState<Found[] | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  async function problem(res: Response): Promise<string> {
+    return apiErrorText(te, locale, await res.json().catch(() => ({})), t("somethingWrong"));
+  }
 
   async function find(e: React.FormEvent) {
     e.preventDefault();
@@ -35,24 +40,24 @@ export function PrivacyTools() {
       if (!res.ok) return setMessage(await problem(res));
       const data = await res.json();
       setFound(data.items);
-      if (data.items.length === 0) setMessage("No patient found with this phone number.");
+      if (data.items.length === 0) setMessage(t("notFound"));
     } catch {
-      setMessage("Could not reach the server.");
+      setMessage(te("NETWORK"));
     } finally {
       setBusy(false);
     }
   }
 
   async function erase(p: Found) {
-    if (!window.confirm(`Erase the name, phone number and ABHA number of ${p.name}? This cannot be undone. Visit counts are kept without a name.`)) return;
+    if (!window.confirm(t("confirmErase", { name: p.name }))) return;
     setBusy(true);
     try {
       const res = await fetch(`/api/admin/patients/${p.id}`, { method: "DELETE" });
       if (!res.ok) return setMessage(await problem(res));
       setFound((list) => list?.filter((x) => x.id !== p.id) ?? null);
-      setMessage(`The data of ${p.name} was erased.`);
+      setMessage(t("erased", { name: p.name }));
     } catch {
-      setMessage("Could not reach the server.");
+      setMessage(te("NETWORK"));
     } finally {
       setBusy(false);
     }
@@ -61,20 +66,17 @@ export function PrivacyTools() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>A patient&apos;s data request</CardTitle>
+        <CardTitle>{t("title")}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <p className="text-sm text-muted-foreground">
-          When a patient asks to see or delete their data: find them by their full phone number, download everything held
-          about them, or erase it. Both actions are written to the audit log.
-        </p>
+        <p className="text-sm text-muted-foreground">{t("help")}</p>
         <form onSubmit={find} className="flex flex-wrap items-end gap-3">
           <div>
-            <Label htmlFor="phone">Phone number</Label>
+            <Label htmlFor="phone">{tc("common.phone")}</Label>
             <Input id="phone" type="tel" inputMode="tel" required value={phone} onChange={(e) => setPhone(e.target.value)} />
           </div>
           <Button type="submit" disabled={busy}>
-            Find
+            {t("find")}
           </Button>
         </form>
 
@@ -89,18 +91,17 @@ export function PrivacyTools() {
             {found.map((p) => (
               <li key={p.id} className="flex flex-wrap items-center gap-3 p-3 text-sm">
                 <span className="min-w-0 flex-1">
-                  <strong>{p.name}</strong>, {p.age} {p.sex} · {p.visits} {p.visits === 1 ? "visit" : "visits"} · first seen{" "}
-                  {p.createdAt.slice(0, 10)}
+                  <strong>{p.name}</strong>, {p.age} {tc(`sex.${p.sex}`)} · {t("visits", { n: p.visits })} · {t("firstSeen", { date: p.createdAt.slice(0, 10) })}
                 </span>
                 <a
                   href={`/api/admin/patients/${p.id}/export`}
                   download
                   className="inline-flex h-8 items-center rounded-md border border-border px-3 hover:bg-muted"
                 >
-                  Download data (JSON)
+                  {t("download")}
                 </a>
                 <Button size="sm" variant="destructive" disabled={busy} onClick={() => erase(p)}>
-                  Erase data
+                  {t("erase")}
                 </Button>
               </li>
             ))}

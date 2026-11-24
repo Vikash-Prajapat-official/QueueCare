@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQueueRefresh } from "@/hooks/use-queue-refresh";
-import { PRIORITY_LABELS } from "@/lib/queue-labels";
+import { apiErrorText } from "@/lib/api-error-text";
 import type { getQueueSnapshot } from "@/lib/queue-service";
 
 type Snapshot = Awaited<ReturnType<typeof getQueueSnapshot>>;
@@ -22,6 +23,10 @@ export function DoctorConsole({
   roomName: string | null;
 }) {
   const router = useRouter();
+  const tr = useTranslations("doctor");
+  const tc = useTranslations();
+  const te = useTranslations("errors");
+  const locale = useLocale();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   useQueueRefresh([snapshot.department.id]);
@@ -38,11 +43,11 @@ export function DoctorConsole({
       const res = await fetch(url, { method: "POST" });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setError(data?.error?.message ?? "Something went wrong.");
+        setError(apiErrorText(te, locale, data, tr("somethingWrong")));
       }
       router.refresh();
     } catch {
-      setError("Could not reach the server.");
+      setError(te("NETWORK"));
     } finally {
       setBusy(false);
     }
@@ -56,8 +61,8 @@ export function DoctorConsole({
       <div>
         <h1 className="text-2xl font-bold">{doctorName}</h1>
         <p className="text-sm text-muted-foreground">
-          {snapshot.department.nameEn}
-          {roomName ? ` · ${roomName}` : ""} · {snapshot.counts.done} done today · {waitingCount} waiting
+          {locale === "hi" ? snapshot.department.nameHi : snapshot.department.nameEn}
+          {roomName ? ` · ${roomName}` : ""} · {tr("doneToday", { n: snapshot.counts.done })} · {tr("waitingN", { n: waitingCount })}
         </p>
       </div>
 
@@ -69,19 +74,19 @@ export function DoctorConsole({
 
       <Card>
         <CardHeader>
-          <CardTitle>{current ? (called ? "Called, waiting for the patient" : "In consultation") : "No current patient"}</CardTitle>
+          <CardTitle>{current ? (called ? tr("calledWaiting") : tr("inConsultation")) : tr("noCurrent")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {current && (
             <div>
               <p className="text-6xl font-bold text-primary">{current.label}</p>
               <p className="mt-2 text-xl">
-                {current.patient.name}, {current.patient.age} {current.patient.sex}
+                {current.patient.name}, {current.patient.age} {tc(`sex.${current.patient.sex}`)}
               </p>
               <p className="text-sm text-muted-foreground">
-                {current.priority !== "NORMAL" && `${PRIORITY_LABELS[current.priority]} · `}
-                {current.visitType === "FOLLOW_UP" ? "Follow-up" : "New visit"}
-                {current.recallCount > 0 && ` · recalled ${current.recallCount}×`}
+                {current.priority !== "NORMAL" && `${tc(`priority.${current.priority}`)} · `}
+                {current.visitType === "FOLLOW_UP" ? tr("followUpVisit") : tr("newVisit")}
+                {current.recallCount > 0 && ` · ${tr("recalled", { n: current.recallCount })}`}
               </p>
             </div>
           )}
@@ -90,22 +95,22 @@ export function DoctorConsole({
             {called && (
               <>
                 <Button className={BIG} onClick={() => act("start")} disabled={busy}>
-                  Start consult
+                  {tr("startConsult")}
                 </Button>
                 <Button className={BIG} variant="outline" onClick={() => act("recall")} disabled={busy}>
-                  Recall
+                  {tr("recall")}
                 </Button>
                 <Button className={BIG} variant="outline" onClick={() => act("skip")} disabled={busy}>
-                  Skip
+                  {tr("skip")}
                 </Button>
                 <Button className={BIG} variant="outline" onClick={() => act("no-show")} disabled={busy}>
-                  No-show
+                  {tr("noShow")}
                 </Button>
               </>
             )}
             {inConsult && (
               <Button className={BIG} onClick={() => act("complete")} disabled={busy}>
-                Complete
+                {tr("complete")}
               </Button>
             )}
             <Button
@@ -114,21 +119,21 @@ export function DoctorConsole({
               onClick={next}
               disabled={busy || called || waitingCount === 0}
             >
-              {inConsult ? "Complete and call next" : "Next"}
+              {inConsult ? tr("completeNext") : tr("next")}
             </Button>
           </div>
-          {called && <p className="text-sm text-muted-foreground">Start, skip or mark no-show before calling the next patient.</p>}
-          {!current && waitingCount === 0 && <p className="text-sm text-muted-foreground">Nobody is waiting.</p>}
+          {called && <p className="text-sm text-muted-foreground">{tr("beforeNext")}</p>}
+          {!current && waitingCount === 0 && <p className="text-sm text-muted-foreground">{tr("nobody")}</p>}
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Waiting ({waitingCount})</CardTitle>
+          <CardTitle>{tr("waitingTitle", { n: waitingCount })}</CardTitle>
         </CardHeader>
         <CardContent>
           {waitingCount === 0 ? (
-            <p className="text-sm text-muted-foreground">Nobody is waiting.</p>
+            <p className="text-sm text-muted-foreground">{tr("nobody")}</p>
           ) : (
             <ol className="divide-y divide-border">
               {snapshot.waiting.map((t) => (
@@ -136,17 +141,17 @@ export function DoctorConsole({
                   <span className="w-6 text-muted-foreground">{t.position}</span>
                   <strong className="w-20 text-lg">{t.label}</strong>
                   <span className="min-w-0 flex-1 text-sm">
-                    {t.patient.name}, {t.patient.age} {t.patient.sex}
+                    {t.patient.name}, {t.patient.age} {tc(`sex.${t.patient.sex}`)}
                     {t.priority !== "NORMAL" && (
                       <span className="ml-2 rounded bg-muted px-1.5 py-0.5 text-xs font-medium">
-                        {PRIORITY_LABELS[t.priority]}
+                        {tc(`priority.${t.priority}`)}
                       </span>
                     )}
                     {t.status === "SKIPPED" && (
-                      <span className="ml-2 rounded bg-muted px-1.5 py-0.5 text-xs font-medium">Skipped earlier</span>
+                      <span className="ml-2 rounded bg-muted px-1.5 py-0.5 text-xs font-medium">{tr("skippedEarlier")}</span>
                     )}
                   </span>
-                  <span className="text-sm text-muted-foreground">~{t.estimatedWaitMinutes} min</span>
+                  <span className="text-sm text-muted-foreground">~{tc("common.minutesShort", { n: t.estimatedWaitMinutes })}</span>
                 </li>
               ))}
             </ol>

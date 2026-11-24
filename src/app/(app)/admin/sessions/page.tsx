@@ -1,26 +1,30 @@
+import { getLocale, getTranslations } from "next-intl/server";
 import { AdminCrud, type Row } from "@/components/admin/admin-crud";
+import { pageTitle } from "@/i18n/meta";
 import { db } from "@/lib/db";
 import { requirePageRole } from "@/lib/page-auth";
 
-export const metadata = { title: "OPD sessions · QueueCare" };
-
-const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+export const generateMetadata = pageTitle("sessions");
 
 export default async function SessionsPage() {
   await requirePageRole(["ADMIN"]);
+  const [t, locale] = await Promise.all([getTranslations("admin.sessions"), getLocale()]);
+  const deptName = (d: { nameEn: string; nameHi: string }) => (locale === "hi" ? d.nameHi : d.nameEn);
+  const dept = { select: { nameEn: true, nameHi: true } };
+  const days = [0, 1, 2, 3, 4, 5, 6].map((i) => t(`days.${i}`));
   const [sessions, departments, doctors] = await Promise.all([
     db.opdSession.findMany({
-      include: { department: { select: { nameEn: true } }, doctor: { select: { displayName: true } } },
+      include: { department: dept, doctor: { select: { displayName: true } } },
       orderBy: [{ departmentId: "asc" }, { weekday: "asc" }, { startTime: "asc" }],
     }),
     db.department.findMany({ where: { active: true }, orderBy: { nameEn: "asc" } }),
-    db.doctor.findMany({ include: { department: { select: { nameEn: true } } }, orderBy: { displayName: "asc" } }),
+    db.doctor.findMany({ include: { department: dept }, orderBy: { displayName: "asc" } }),
   ]);
   const rows = sessions.map((s) => ({
     id: s.id,
-    departmentName: s.department.nameEn,
-    day: DAYS[s.weekday] ?? String(s.weekday),
-    time: `${s.startTime} to ${s.endTime}`,
+    departmentName: deptName(s.department),
+    day: days[s.weekday] ?? String(s.weekday),
+    time: t("timeRange", { start: s.startTime, end: s.endTime }),
     doctorName: s.doctor?.displayName ?? null,
     weekday: s.weekday,
     startTime: s.startTime,
@@ -30,48 +34,48 @@ export default async function SessionsPage() {
   }));
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">OPD sessions</h1>
+      <h1 className="text-2xl font-bold">{t("title")}</h1>
       <AdminCrud
-        noun="session"
+        noun={t("noun")}
         endpoint="/api/admin/sessions"
         canDelete
-        intro="The weekly timetable, for example Medicine, Monday to Saturday, 09:00 to 13:00. Add one session per day."
+        intro={t("intro")}
         rows={rows as Row[]}
         columns={[
-          { header: "Department", key: "departmentName" },
-          { header: "Day", key: "day" },
-          { header: "Time", key: "time" },
-          { header: "Doctor", key: "doctorName" },
-          { header: "Max tokens", key: "maxTokens" },
+          { header: t("department"), key: "departmentName" },
+          { header: t("day"), key: "day" },
+          { header: t("time"), key: "time" },
+          { header: t("doctor"), key: "doctorName" },
+          { header: t("maxTokens"), key: "maxTokens" },
         ]}
         fields={[
           {
             name: "departmentId",
-            label: "Department",
+            label: t("department"),
             type: "select",
             required: true,
             onEdit: false,
-            options: departments.map((d) => ({ value: d.id, label: d.nameEn })),
+            options: departments.map((d) => ({ value: d.id, label: deptName(d) })),
           },
           {
             name: "doctorId",
-            label: "Doctor",
+            label: t("doctor"),
             type: "select",
             nullable: true,
-            options: doctors.map((d) => ({ value: d.id, label: `${d.displayName} (${d.department.nameEn})` })),
-            help: "Optional. Must belong to the same department.",
+            options: doctors.map((d) => ({ value: d.id, label: `${d.displayName} (${deptName(d.department)})` })),
+            help: t("doctorHelp"),
           },
           {
             name: "weekday",
-            label: "Day",
+            label: t("day"),
             type: "select",
             required: true,
             numeric: true,
-            options: DAYS.map((d, i) => ({ value: String(i), label: d })),
+            options: days.map((d, i) => ({ value: String(i), label: d })),
           },
-          { name: "startTime", label: "Start", type: "time", required: true, defaultValue: "09:00" },
-          { name: "endTime", label: "End", type: "time", required: true, defaultValue: "13:00" },
-          { name: "maxTokens", label: "Max tokens", type: "number", nullable: true, help: "Optional daily limit." },
+          { name: "startTime", label: t("start"), type: "time", required: true, defaultValue: "09:00" },
+          { name: "endTime", label: t("end"), type: "time", required: true, defaultValue: "13:00" },
+          { name: "maxTokens", label: t("maxTokens"), type: "number", nullable: true, help: t("maxTokensHelp") },
         ]}
       />
     </div>
