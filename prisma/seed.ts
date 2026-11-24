@@ -40,7 +40,8 @@ async function main() {
     role,
     passwordHash,
     departmentId,
-    mustChangePassword: true,
+    // Set SEED_DEMO_LOGINS=1 only for a public demo, so visitors are not forced to change the shared password.
+    mustChangePassword: process.env.SEED_DEMO_LOGINS !== "1",
   });
 
   await prisma.user.upsert({
