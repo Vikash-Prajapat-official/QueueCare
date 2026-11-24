@@ -1,0 +1,7 @@
+# Only for running the end-to-end tests on your own computer: lets the tests reach the database.
+#   docker compose -f docker-compose.yml -f docker-compose.e2e.yml up -d
+# The port is open on this computer only (127.0.0.1), never on the network. Do not use it on the hospital server.
+services:
+  db:
+    ports:
+      - "127.0.0.1:5432:5432"

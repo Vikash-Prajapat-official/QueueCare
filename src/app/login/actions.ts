@@ -10,7 +10,7 @@ export async function loginAction(
 ): Promise<{ error?: "rate_limited" | "invalid" }> {
   // Only same-site paths are accepted as the page to return to.
   const callback = String(formData.get("callbackUrl") ?? "");
-  const redirectTo = callback.startsWith("/") && !callback.startsWith("//") ? callback : "/login";
+  const redirectTo = callback.startsWith("/") && !callback.startsWith("//") ? callback : "/post-login";
 
   try {
     await signIn("credentials", {

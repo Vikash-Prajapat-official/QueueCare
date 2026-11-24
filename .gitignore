@@ -17,3 +17,8 @@ test-results
 /public/sw.js
 /public/sw.js.map
 /public/swe-worker-*.js
+
+# test output
+/test-results/
+/playwright-report/
+/blob-report/

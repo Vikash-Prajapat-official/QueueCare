@@ -140,6 +140,51 @@ async function main() {
     }
   }
 
+  // The six days before today: finished visits with plausible waits and consult times, so the
+  // Reports screen has a real chart on a fresh install. Only added when there is no earlier history.
+  if ((await prisma.token.count({ where: { date: { lt: date } } })) === 0) {
+    const pool = await prisma.patient.findMany({ take: 30, select: { id: true } });
+    const consultBase: Record<string, number> = { MED: 9, PED: 7, GYN: 11, ORT: 8 };
+    for (let back = 6; back >= 1; back--) {
+      const day = new Date(date.getTime() - back * 86_400_000);
+      if (day.getUTCDay() === 0) continue; // Sunday: no OPD
+      const counters = new Map<string, number>();
+      const perDay = 14 + ((back * 5) % 9);
+      for (let i = 0; i < perDay; i++) {
+        const di = (i + back) % deptIds.length;
+        const departmentId = deptIds[di]!;
+        const prefix = DEPARTMENTS[di]!.prefix;
+        const seqNo = (counters.get(departmentId) ?? 0) + 1;
+        counters.set(departmentId, seqNo);
+
+        // Registered between 09:00 and 12:00 hospital time (UTC+5:30), a few minutes apart.
+        const created = new Date(day.getTime() + (9 * 60 - 330) * 60_000 + i * 11 * 60_000);
+        const wait = 6 + ((i * 7 + back * 3) % 30); // 6 to 35 minutes
+        const consult = (consultBase[prefix] ?? 8) + ((i * 5) % 7);
+        const noShow = i % 11 === 10;
+        const called = new Date(created.getTime() + wait * 60_000);
+        await prisma.token.create({
+          data: {
+            code: generateTokenCode(),
+            seqNo,
+            date: day,
+            departmentId,
+            doctorId: doctorByDept.get(departmentId),
+            patientId: pool[(i * 3 + back) % pool.length]!.id,
+            visitType: i % 3 === 0 ? "FOLLOW_UP" : "NEW",
+            priority: i % 8 === 4 ? "ELDERLY" : "NORMAL",
+            status: noShow ? "NO_SHOW" : "DONE",
+            source: i % 4 === 0 ? "SELF" : "DESK",
+            createdAt: created,
+            calledAt: called,
+            startedAt: noShow ? null : new Date(called.getTime() + 60_000),
+            completedAt: noShow ? null : new Date(called.getTime() + (1 + consult) * 60_000),
+          },
+        });
+      }
+    }
+  }
+
   const [departments, users, tokens] = await Promise.all([
     prisma.department.count(),
     prisma.user.count(),
