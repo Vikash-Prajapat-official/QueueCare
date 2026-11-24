@@ -1,4 +1,4 @@
-# Phase 1: app + postgres. The backup service and optional Caddy are added in Phase 5.
+# App + Postgres, a nightly encrypted backup service, and optional HTTPS (Caddy).
 services:
   db:
     image: postgres:16
@@ -31,5 +31,44 @@ services:
       retries: 5
       start_period: 30s
 
+  # Nightly encrypted backups (02:00) into ./backups, 14 days kept. See ADMIN_GUIDE.md to restore.
+  backup:
+    build:
+      context: .
+      dockerfile: backup/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      TZ: ${BACKUP_TZ:-Asia/Kolkata}
+      PGHOST: db
+      PGUSER: queuecare
+      PGPASSWORD: ${POSTGRES_PASSWORD:-change-me}
+      PGDATABASE: queuecare
+      BACKUP_PASSPHRASE: ${BACKUP_PASSPHRASE:?Set BACKUP_PASSPHRASE in the .env file}
+      BACKUP_KEEP_DAYS: ${BACKUP_KEEP_DAYS:-14}
+    volumes:
+      - ./backups:/backups
+
+  # Optional HTTPS: docker compose --profile https up -d   (see the Caddyfile)
+  caddy:
+    image: caddy:2
+    profiles: ["https"]
+    restart: unless-stopped
+    depends_on:
+      - app
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-localhost}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
 volumes:
   pgdata:
+  caddy_data:
+  caddy_config:

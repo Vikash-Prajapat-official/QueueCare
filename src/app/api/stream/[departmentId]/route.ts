@@ -1,6 +1,7 @@
 import { ApiError, requireRole, route } from "@/lib/api";
 import { db } from "@/lib/db";
 import { isValidDisplayKey, parseDepartmentIds } from "@/lib/display";
+import { enforceIp } from "@/lib/public-limits";
 import { ROLES } from "@/lib/rbac";
 import { subscribeQueue } from "@/lib/sse";
 
@@ -17,7 +18,11 @@ export const GET = route(async (req: Request, ctx: { params: Promise<{ departmen
   const ids = parseDepartmentIds(departmentId);
   if (!ids) throw new ApiError(400, "VALIDATION", "Invalid department list.");
 
-  if (!isValidDisplayKey(new URL(req.url).searchParams.get("key"))) await requireRole(ROLES);
+  const key = new URL(req.url).searchParams.get("key");
+  if (!isValidDisplayKey(key)) {
+    if (key) enforceIp(req.headers, "display-key", 20, 60_000, "wrong display keys"); // stops key guessing
+    await requireRole(ROLES);
+  }
 
   const found = await db.department.count({ where: { id: { in: ids } } });
   if (found !== ids.length) throw new ApiError(404, "NOT_FOUND", "Department not found.");

@@ -6,6 +6,7 @@ import type { Prisma } from "@prisma/client";
 import type { z } from "zod";
 import { ApiError, type AuthedUser } from "@/lib/api";
 import { audit } from "@/lib/audit";
+import { CONSENT_NOTICE_VERSION, CONSENT_PURPOSE } from "@/lib/consent";
 import { db } from "@/lib/db";
 import {
   ACTION_FROM,
@@ -31,7 +32,6 @@ import { transferSchema, type createTokenSchema } from "@/lib/queue-schemas";
 
 type Tx = Prisma.TransactionClient;
 
-export const CONSENT_NOTICE_VERSION = "v1";
 const DEFAULT_TIMEZONE = "Asia/Kolkata";
 
 // Fields the engine needs for every token of a department.
@@ -170,7 +170,7 @@ export async function createToken(
     if (!patientId) throw new ApiError(400, "VALIDATION", "Patient details are required.");
 
     await tx.consentRecord.create({
-      data: { patientId, purpose: "OPD queue", noticeVersion: CONSENT_NOTICE_VERSION, channel: source },
+      data: { patientId, purpose: CONSENT_PURPOSE, noticeVersion: CONSENT_NOTICE_VERSION, channel: source },
     });
 
     // Numbering restarts at 1 each local day because the highest number is taken per (department, date).

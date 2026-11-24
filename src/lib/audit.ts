@@ -1,11 +1,19 @@
 import type { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 
+/**
+ * The visitor's IP: the first x-forwarded-for value, which Caddy sets to the real address, or the
+ * connection address Next.js fills in. Without a proxy a visitor can send this header themselves,
+ * so per-IP limits are only dependable behind Caddy. (On Docker Desktop for Windows or Mac every
+ * device on the network shows up as one gateway address.)
+ */
+export function ipFromHeaders(headers: Headers): string | null {
+  const raw = headers.get("x-forwarded-for")?.split(",")[0]?.trim() || headers.get("x-real-ip")?.trim() || null;
+  return raw ? raw.slice(0, 64) : null;
+}
+
 export function clientIp(req?: Request): string | null {
-  if (!req) return null;
-  const fwd = req.headers.get("x-forwarded-for");
-  if (fwd) return fwd.split(",")[0]?.trim() || null;
-  return req.headers.get("x-real-ip");
+  return req ? ipFromHeaders(req.headers) : null;
 }
 
 /** Writes one AuditLog row. Never put personal data (names, phones) in `action`. */

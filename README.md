@@ -2,7 +2,18 @@
 
 Free, open-source OPD token and queue system for Indian hospitals and clinics. MIT licence.
 
-> Status: **Phase 4 of 7** (adds live updates, the TV board with voice, patient self check-in and the token status page). Reports, backups, Hindi for every screen and the rest arrive in later phases.
+> Status: **Phase 5 of 7** (adds reports and CSV export, consent records, the nightly retention job, encrypted nightly backups, rate limits and the audit log screen). The landing page, Hindi for every screen and PWA, then tests, CI and the admin guide, arrive in later phases.
+
+## Backups
+
+Every night at 02:00 the `backup` service saves an encrypted copy of the database to the `backups` folder next to `docker-compose.yml` and keeps 14 days. Set a strong `BACKUP_PASSPHRASE` in `.env` and keep a copy of it somewhere safe: **without it a backup cannot be opened**. Copy the `backups` folder to another disk or computer now and then.
+
+```bash
+docker compose exec backup /scripts/backup.sh                       # back up now
+docker compose exec backup /scripts/restore.sh /backups/<file>.dump.gpg queuecare_restored   # restore into a NEW database
+```
+
+On Windows Git Bash, put `MSYS_NO_PATHCONV=1` in front of these commands.
 
 ## TV board and check-in
 

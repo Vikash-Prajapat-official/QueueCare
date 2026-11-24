@@ -17,7 +17,7 @@ const SEXES = [
   { value: "O", en: "Other", hi: "अन्य" },
 ];
 
-export function CheckInForm({ departments, retentionDays }: { departments: Dept[]; retentionDays: number }) {
+export function CheckInForm({ departments, notice }: { departments: Dept[]; notice: { en: string; hi: string } }) {
   const router = useRouter();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -135,12 +135,10 @@ export function CheckInForm({ departments, retentionDays }: { departments: Dept[
 
       <div className="rounded-md border border-border bg-muted p-3 text-sm">
         <p>
-          We keep your name, phone number and age only to run the OPD queue. We never record your illness. They are made
-          anonymous after {retentionDays} days. You can ask the hospital to delete them.
+          {notice.en}
         </p>
         <p className="mt-2">
-          हम आपका नाम, फ़ोन नंबर और उम्र सिर्फ़ OPD की कतार चलाने के लिए रखते हैं। आपकी बीमारी की कोई जानकारी दर्ज नहीं की जाती।
-          ये जानकारी {retentionDays} दिन बाद गुमनाम कर दी जाती है। आप अस्पताल से इसे हटाने के लिए कह सकते हैं।
+          {notice.hi}
         </p>
       </div>
       <label htmlFor="consent" className="flex items-start gap-3 text-base">

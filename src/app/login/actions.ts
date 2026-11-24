@@ -15,7 +15,14 @@ export async function loginAction(_prev: { error?: string }, formData: FormData)
       redirectTo,
     });
   } catch (e) {
-    if (e instanceof AuthError) return { error: "Wrong phone number or password." };
+    if (e instanceof AuthError) {
+      const tooMany = (e as { code?: string }).code === "rate_limited";
+      return {
+        error: tooMany
+          ? "Too many tries. Please wait 15 minutes, or ask the admin to help."
+          : "Wrong phone number or password.",
+      };
+    }
     throw e; // the redirect after a successful login is thrown on purpose
   }
   return {};

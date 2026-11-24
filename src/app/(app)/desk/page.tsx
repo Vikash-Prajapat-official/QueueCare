@@ -1,3 +1,4 @@
+import { consentNotice, retentionDays } from "@/lib/consent";
 import { db } from "@/lib/db";
 import { requirePageRole } from "@/lib/page-auth";
 import { listDepartments } from "@/lib/queue-service";
@@ -18,6 +19,7 @@ export default async function DeskPage() {
         departments={departments}
         hospitalName={hospital?.name ?? "QueueCare"}
         appUrl={process.env.APP_URL ?? ""}
+        notice={consentNotice(retentionDays())}
       />
     </div>
   );

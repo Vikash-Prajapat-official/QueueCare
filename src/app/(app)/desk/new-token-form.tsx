@@ -43,10 +43,12 @@ export function NewTokenForm({
   departments,
   hospitalName,
   appUrl,
+  notice,
 }: {
   departments: Dept[];
   hospitalName: string;
   appUrl: string;
+  notice: { en: string; hi: string };
 }) {
   const [phone, setPhone] = useState("");
   const [matches, setMatches] = useState<Match[]>([]);
@@ -292,8 +294,12 @@ export function NewTokenForm({
               required
             />
             <span>
-              I have told the patient that their name, phone number and age are kept only to run the queue, and they
-              agree.
+              <span className="mb-1 block rounded-md bg-muted p-2">
+                {notice.en}
+                <br />
+                {notice.hi}
+              </span>
+              I have read this notice to the patient and they agree.
             </span>
           </label>
 

@@ -1,6 +1,8 @@
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ApiError } from "@/lib/api";
+import { enforceIp } from "@/lib/public-limits";
 import { getTokenStatusByCode } from "@/lib/queue-service";
 import { TokenStatusView } from "./token-status";
 
@@ -17,10 +19,14 @@ export default async function TokenPage({ params }: { params: Promise<{ code: st
   const { code } = await params;
   const upper = code.toUpperCase();
   try {
+    enforceIp(await headers(), "status-page", 60, 60_000, "page requests"); // stops guessing codes
     const initial = await getTokenStatusByCode(upper);
     return <TokenStatusView code={upper} initial={initial} />;
   } catch (e) {
     if (e instanceof ApiError && e.status === 404) notFound();
+    if (e instanceof ApiError && e.status === 429) {
+      return <main className="p-6 text-center text-lg">Too many requests. Please wait a minute and try again.</main>;
+    }
     throw e;
   }
 }

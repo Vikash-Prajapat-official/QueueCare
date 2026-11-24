@@ -9,6 +9,8 @@ export class ApiError extends Error {
     public status: number,
     public code: string,
     message: string,
+    /** For 429 answers: sent as the Retry-After header. */
+    public retryAfterSeconds?: number,
   ) {
     super(message);
   }
@@ -57,8 +59,8 @@ export async function readJson(req: Request): Promise<unknown> {
   }
 }
 
-export function errorResponse(status: number, code: string, message: string) {
-  return NextResponse.json({ error: { code, message } }, { status });
+export function errorResponse(status: number, code: string, message: string, headers?: Record<string, string>) {
+  return NextResponse.json({ error: { code, message } }, { status, headers });
 }
 
 function prismaCode(e: unknown): string | undefined {
@@ -69,7 +71,10 @@ function prismaCode(e: unknown): string | undefined {
 }
 
 export function toErrorResponse(e: unknown) {
-  if (e instanceof ApiError) return errorResponse(e.status, e.code, e.message);
+  if (e instanceof ApiError) {
+    const headers = e.retryAfterSeconds ? { "Retry-After": String(e.retryAfterSeconds) } : undefined;
+    return errorResponse(e.status, e.code, e.message, headers);
+  }
   if (e instanceof ZodError) {
     const first = e.issues[0];
     const where = first && first.path.length ? `${first.path.join(".")}: ` : "";

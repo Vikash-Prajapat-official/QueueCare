@@ -24,7 +24,7 @@ export type CheckInInput = z.infer<typeof checkInSchema>;
 const ACTIVE = ["WAITING", "CALLED", "IN_CONSULT", "SKIPPED"] as const;
 
 export async function selfCheckIn(input: CheckInInput, req: Request) {
-  // 30 per IP per hour. The IP is only known behind a reverse proxy (Caddy sets x-forwarded-for).
+  // 30 per IP per hour. Dependable behind Caddy; without it a visitor can fake the IP (see ipFromHeaders).
   const ip = clientIp(req);
   if (ip) {
     const recent = await db.auditLog.count({

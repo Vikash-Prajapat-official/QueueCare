@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { consentNotice, retentionDays } from "@/lib/consent";
 import { db } from "@/lib/db";
 import { CheckInForm } from "./checkin-form";
 
@@ -15,7 +16,7 @@ export default async function CheckInPage() {
     }),
     db.hospital.findFirst({ select: { name: true } }),
   ]);
-  const retentionDays = Number(process.env.RETENTION_DAYS) || 90;
+  const notice = consentNotice(retentionDays());
 
   return (
     <main className="mx-auto max-w-md space-y-4 p-4">
@@ -27,7 +28,7 @@ export default async function CheckInPage() {
       {departments.length === 0 ? (
         <p className="rounded-md bg-muted p-4 text-center">Check-in is not open yet. Please use the registration desk.</p>
       ) : (
-        <CheckInForm departments={departments} retentionDays={retentionDays} />
+        <CheckInForm departments={departments} notice={notice} />
       )}
     </main>
   );

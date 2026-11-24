@@ -1,0 +1,12 @@
+# Optional HTTPS in front of the app:  docker compose --profile https up -d
+# SITE_ADDRESS is set in .env: a hostname or IP on the hospital network (a certificate from Caddy's
+# own authority, which devices must trust once), or a real domain name (then delete the "tls internal"
+# line and Caddy gets a free public certificate; the server must be reachable on ports 80 and 443).
+# Caddy also tells the app the visitor's real IP, which the per-IP rate limits need.
+{$SITE_ADDRESS:localhost} {
+	tls internal
+	reverse_proxy app:3000 {
+		# send live updates (SSE) at once instead of waiting to fill a buffer
+		flush_interval -1
+	}
+}

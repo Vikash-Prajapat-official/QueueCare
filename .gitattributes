@@ -1,0 +1,5 @@
+# Shell scripts and the Caddyfile run on Linux, so they must keep LF line endings even when
+# the repository is checked out on Windows.
+*.sh text eol=lf
+Caddyfile text eol=lf
+Dockerfile text eol=lf
