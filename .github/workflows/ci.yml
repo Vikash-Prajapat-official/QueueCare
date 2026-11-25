@@ -90,7 +90,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Check docker-compose.yml
-        run: docker compose config --quiet
+        # The compose file reads .env, exactly as a new user creates it from .env.example.
+        run: |
+          cp .env.example .env
+          docker compose config --quiet
         env:
           BACKUP_PASSPHRASE: ci-only
       - uses: docker/setup-buildx-action@v3
